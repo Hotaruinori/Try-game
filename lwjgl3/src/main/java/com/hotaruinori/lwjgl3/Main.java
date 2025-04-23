@@ -1,6 +1,5 @@
 package com.hotaruinori.lwjgl3;
 
-
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -17,11 +16,6 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
-import com.badlogic.gdx.graphics.g2d.TextureRegion; //角色移動用
-import com.badlogic.gdx.graphics.g2d.Animation; //角色移動用
-
-
-
 public class Main implements ApplicationListener {
     // 遊戲資源
     Texture backgroundTexture;
@@ -34,33 +28,12 @@ public class Main implements ApplicationListener {
     FitViewport viewport;
 
     //遊戲物件
-    Sprite bucketSprite;
+    Character character; // 替換原來的 bucketSprite
     Vector2 touchPos;
     Array<Sprite> dropSprites;
     float dropTimer;
     Rectangle bucketRectangle;
     Rectangle dropRectangle;
-
-    // 角色動畫系統
-    private Animation<TextureRegion> walkUpAnimation;
-    private Animation<TextureRegion> walkDownAnimation;
-    private Animation<TextureRegion> walkLeftAnimation;
-    private Animation<TextureRegion> walkRightAnimation;
-    private TextureRegion[] standingFrames; // 站立幀
-    private float stateTime = 0; // 動畫狀態時間
-
-    //角色狀態
-    private CharacterState state = CharacterState.STANDING; // 角色狀態
-    private FacingDirection facing = FacingDirection.DOWN; // 面向方向
-
-    //枚舉類型
-    private enum CharacterState {
-        STANDING, WALKING
-    }
-
-    private enum FacingDirection {
-        UP, DOWN, LEFT, RIGHT
-    }
 
     @Override
     public void create() {
@@ -69,51 +42,24 @@ public class Main implements ApplicationListener {
         dropTexture = new Texture("drop.png");
         dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.mp3"));
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
+
         //初始化渲染系統
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(8, 5);
-        // 新增角色動畫初始化
-        initCharacterAnimations();
-        // 修改bucketSprite初始化，使用動畫的第一幀
-        bucketSprite = new Sprite(standingFrames[FacingDirection.DOWN.ordinal()]);
-        bucketSprite.setSize(1, 1);
+
+        // 初始化角色
+        character = new Character();
+
         // 其他物件
         touchPos = new Vector2();
         dropSprites = new Array<>();
         bucketRectangle = new Rectangle();
         dropRectangle = new Rectangle();
+
         //設置音樂
         music.setLooping(true);
         music.setVolume(.5f);
         music.play();
-
-    }
-    private void initCharacterAnimations() {
-        // 加載站立幀紋理
-        standingFrames = new TextureRegion[4];
-        standingFrames[FacingDirection.UP.ordinal()] = new TextureRegion(new Texture("character/dora_walk_back1.png"));
-        standingFrames[FacingDirection.DOWN.ordinal()] = new TextureRegion(new Texture("character/dora_standing.png"));
-        standingFrames[FacingDirection.LEFT.ordinal()] = new TextureRegion(new Texture("character/dora_walk_left_1.png"));
-        standingFrames[FacingDirection.RIGHT.ordinal()] = new TextureRegion(new Texture("character/dora_walk_right_1.png"));
-
-        // 初始化走路動畫 (每方向2幀)
-        walkUpAnimation = new Animation<TextureRegion>(0.15f,
-            new TextureRegion(new Texture("character/dora_walk_back1.png")),
-            new TextureRegion(new Texture("character/dora_walk_back2.png"))
-        );
-        walkDownAnimation = new Animation<TextureRegion>(0.15f,
-            new TextureRegion(new Texture("character/dora_standing.png")),
-            new TextureRegion(new Texture("character/dora_standing.png"))
-        );
-        walkLeftAnimation = new Animation<TextureRegion>(0.15f,
-            new TextureRegion(new Texture("character/dora_walk_left_1.png")),
-            new TextureRegion(new Texture("character/dora_walk_left_2.png"))
-        );
-        walkRightAnimation = new Animation<TextureRegion>(0.15f,
-            new TextureRegion(new Texture("character/dora_walk_right_1.png")),
-            new TextureRegion(new Texture("character/dora_walk_right_2.png"))
-        );
-        // 其他方向類似...
     }
 
     @Override
@@ -135,70 +81,57 @@ public class Main implements ApplicationListener {
 
         // 上下左右鍵盤移動
         if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            bucketSprite.translateX(speed * delta);
-            facing = FacingDirection.RIGHT;
+            character.move(speed * delta, 0);
+            character.setFacing(Character.FacingDirection.RIGHT);
             moving = true;
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            bucketSprite.translateX(-speed * delta);
-            facing = FacingDirection.LEFT;
+            character.move(-speed * delta, 0);
+            character.setFacing(Character.FacingDirection.LEFT);
             moving = true;
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            bucketSprite.translateY(speed * delta);
-            facing = FacingDirection.UP;
+            character.move(0, speed * delta);
+            character.setFacing(Character.FacingDirection.UP);
             moving = true;
         }
         else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            bucketSprite.translateY(-speed * delta);
-            facing = FacingDirection.DOWN;
+            character.move(0, -speed * delta);
+            character.setFacing(Character.FacingDirection.DOWN);
             moving = true;
         }
 
         if (Gdx.input.isTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
             viewport.unproject(touchPos);
-            bucketSprite.setCenterX(touchPos.x);
-            // 根據觸摸位置決定面向方向
-            facing = (touchPos.x > bucketSprite.getX()) ? FacingDirection.RIGHT : FacingDirection.LEFT;
+            //觸發角色class的移動功能
+            character.moveTo(touchPos.x, touchPos.y);
             moving = true;
         }
-        //呼叫動畫狀態更新
-        updateAnimationState(moving, delta);
-    }
-    //動畫狀態更新
-    private void updateAnimationState(boolean moving, float delta) {
-        if (moving) {
-            state = CharacterState.WALKING;
-            stateTime += delta;
-            bucketSprite.setRegion(getCurrentAnimationFrame());
-        } else {
-            state = CharacterState.STANDING;
-            stateTime = 0;
-            bucketSprite.setRegion(standingFrames[facing.ordinal()]);
-        }
-    }
-    //動畫狀態更新
-    private TextureRegion getCurrentAnimationFrame() {
-        switch (facing) {
-            case UP: return walkUpAnimation.getKeyFrame(stateTime, true);
-            case DOWN: return walkDownAnimation.getKeyFrame(stateTime, true);
-            case LEFT: return walkLeftAnimation.getKeyFrame(stateTime, true);
-            case RIGHT: return walkRightAnimation.getKeyFrame(stateTime, true);
-            default: return standingFrames[facing.ordinal()];
-        }
+
+        // 更新角色移動和動畫
+        character.updateMovement(delta);
+        character.update(delta, moving);
     }
 
     private void logic() {
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
-        float bucketWidth = bucketSprite.getWidth();
-        float bucketHeight = bucketSprite.getHeight();
 
-        bucketSprite.setX(MathUtils.clamp(bucketSprite.getX(), 0, worldWidth - bucketWidth));
+        // 限制角色移動範圍
+        character.getSprite().setX(MathUtils.clamp(
+            character.getX(),
+            0,
+            worldWidth - character.getWidth()
+        ));
 
         float delta = Gdx.graphics.getDeltaTime();
-        bucketRectangle.set(bucketSprite.getX(), bucketSprite.getY(), bucketWidth, bucketHeight);
+        bucketRectangle.set(
+            character.getX(),
+            character.getY(),
+            character.getWidth(),
+            character.getHeight()
+        );
 
         for (int i = dropSprites.size - 1; i >= 0; i--) {
             Sprite dropSprite = dropSprites.get(i);
@@ -232,7 +165,7 @@ public class Main implements ApplicationListener {
         float worldHeight = viewport.getWorldHeight();
 
         spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight);
-        bucketSprite.draw(spriteBatch);
+        character.getSprite().draw(spriteBatch);
 
         for (Sprite dropSprite : dropSprites) {
             dropSprite.draw(spriteBatch);
@@ -256,43 +189,19 @@ public class Main implements ApplicationListener {
 
     @Override
     public void pause() {
-
     }
 
     @Override
     public void resume() {
-
     }
 
     @Override
     public void dispose() {
-        // 原有釋放代碼...
         backgroundTexture.dispose();
         dropTexture.dispose();
         dropSound.dispose();
         music.dispose();
         spriteBatch.dispose();
-
-        // 新增釋放動畫資源
-        for (TextureRegion frame : standingFrames) {
-            if (frame != null) frame.getTexture().dispose();
-        }
-        disposeAnimation(walkUpAnimation);
-        disposeAnimation(walkDownAnimation);
-        disposeAnimation(walkLeftAnimation);
-        disposeAnimation(walkRightAnimation);
+        character.dispose();
     }
-
-    private void disposeAnimation(Animation<TextureRegion> animation) {
-        if (animation != null) {
-            for (TextureRegion frame : animation.getKeyFrames()) {
-                if (frame != null && frame.getTexture() != null) {
-                    frame.getTexture().dispose();
-                }
-            }
-        }
-    }
-
-
 }
-
