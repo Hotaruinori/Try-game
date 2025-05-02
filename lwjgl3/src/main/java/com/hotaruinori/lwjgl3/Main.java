@@ -4,43 +4,34 @@ import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
-import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
-import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
-import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
-    Texture backgroundTexture;
-    Texture dropTexture;
-    Sound dropSound;
-    Music music;
+    private Texture backgroundTexture;
+    private Music music;
 
     //渲染相關
-    SpriteBatch spriteBatch;
-    FitViewport viewport;
+    private SpriteBatch spriteBatch;
+    private FitViewport viewport;
 
     //遊戲物件
-    Character character; // 替換原來的 bucketSprite
-    Vector2 touchPos;
-    Array<Sprite> dropSprites;
-    float dropTimer;
-    Rectangle bucketRectangle;
-    Rectangle dropRectangle;
+    private Character character;
+    private Vector2 touchPos;
+    private Rectangle characterRectangle;
+    private Projectiles rainDrops;
 
     @Override
     public void create() {
         //初始化基礎資源
         backgroundTexture = new Texture("background.png");
-        dropTexture = new Texture("drop.png");
-        dropSound = Gdx.audio.newSound(Gdx.files.internal("drop.mp3"));
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -50,11 +41,12 @@ public class Main implements ApplicationListener {
         // 初始化角色
         character = new Character();
 
+        // 初始化投射物系統
+        rainDrops = new Projectiles("drop.png", "drop.mp3", 0.5f, 4f);
+
         // 其他物件
         touchPos = new Vector2();
-        dropSprites = new Array<>();
-        bucketRectangle = new Rectangle();
-        dropRectangle = new Rectangle();
+        characterRectangle = new Rectangle();
 
         //設置音樂
         music.setLooping(true);
@@ -78,40 +70,29 @@ public class Main implements ApplicationListener {
         float speed = 4f;
         float delta = Gdx.graphics.getDeltaTime();
         boolean moving = false;
+        Vector2 direction = new Vector2(0, 0);
 
-        // 上下左右鍵盤移動
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) {
-            character.move(speed * delta, 0);
-            character.setFacing(Character.FacingDirection.RIGHT);
-            moving = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) {
-            character.move(-speed * delta, 0);
-            character.setFacing(Character.FacingDirection.LEFT);
-            moving = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.UP)) {
-            character.move(0, speed * delta);
-            character.setFacing(Character.FacingDirection.UP);
-            moving = true;
-        }
-        else if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) {
-            character.move(0, -speed * delta);
-            character.setFacing(Character.FacingDirection.DOWN);
+        // 處理鍵盤輸入（現在可以同時檢測多個按鍵）
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) direction.x += 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) direction.x -= 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.UP)) direction.y += 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) direction.y -= 1;
+
+        if (!direction.isZero()) {
+            character.moveWithDirection(delta, direction, speed);
             moving = true;
         }
 
+        // 觸控移動保持不變
         if (Gdx.input.isTouched()) {
             touchPos.set(Gdx.input.getX(), Gdx.input.getY());
             viewport.unproject(touchPos);
-            //觸發角色class的移動功能
             character.moveTo(touchPos.x, touchPos.y);
             moving = true;
         }
 
-        // 更新角色移動和動畫
-        character.updateMovement(delta);
         character.update(delta, moving);
+        character.updateMovement(delta);
     }
 
     private void logic() {
@@ -125,34 +106,17 @@ public class Main implements ApplicationListener {
             worldWidth - character.getWidth()
         ));
 
-        float delta = Gdx.graphics.getDeltaTime();
-        bucketRectangle.set(
+        // 更新角色碰撞框
+        characterRectangle.set(
             character.getX(),
             character.getY(),
             character.getWidth(),
             character.getHeight()
         );
 
-        for (int i = dropSprites.size - 1; i >= 0; i--) {
-            Sprite dropSprite = dropSprites.get(i);
-            float dropWidth = dropSprite.getWidth();
-            float dropHeight = dropSprite.getHeight();
 
-            dropSprite.translateY(-2f * delta);
-            dropRectangle.set(dropSprite.getX(), dropSprite.getY(), dropWidth, dropHeight);
-
-            if (dropSprite.getY() < -dropHeight) dropSprites.removeIndex(i);
-            else if (bucketRectangle.overlaps(dropRectangle)) {
-                dropSprites.removeIndex(i);
-                dropSound.play();
-            }
-        }
-
-        dropTimer += delta;
-        if (dropTimer > 1f) {
-            dropTimer = 0;
-            createDroplet();
-        }
+        // 更新投射物
+        rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character);
     }
 
     private void draw() {
@@ -166,25 +130,9 @@ public class Main implements ApplicationListener {
 
         spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight);
         character.getSprite().draw(spriteBatch);
-
-        for (Sprite dropSprite : dropSprites) {
-            dropSprite.draw(spriteBatch);
-        }
+        rainDrops.render(spriteBatch);
 
         spriteBatch.end();
-    }
-
-    private void createDroplet() {
-        float dropWidth = 1;
-        float dropHeight = 1;
-        float worldWidth = viewport.getWorldWidth();
-        float worldHeight = viewport.getWorldHeight();
-
-        Sprite dropSprite = new Sprite(dropTexture);
-        dropSprite.setSize(dropWidth, dropHeight);
-        dropSprite.setX(MathUtils.random(0f, worldWidth - dropWidth));
-        dropSprite.setY(worldHeight);
-        dropSprites.add(dropSprite);
     }
 
     @Override
@@ -198,10 +146,9 @@ public class Main implements ApplicationListener {
     @Override
     public void dispose() {
         backgroundTexture.dispose();
-        dropTexture.dispose();
-        dropSound.dispose();
         music.dispose();
         spriteBatch.dispose();
         character.dispose();
+        rainDrops.dispose();
     }
 }

@@ -28,10 +28,36 @@ public class Character {
     private Animation<TextureRegion> walkLeftAnimation;
     private Animation<TextureRegion> walkRightAnimation;
     private TextureRegion[] standingFrames;
+    // 角色中心點
+    public Vector2 getCenterPosition() {
+        return new Vector2(
+            sprite.getX() + sprite.getWidth() / 2f,
+            sprite.getY() + sprite.getHeight() / 2f
+        );
+    }
 
     // 觸碰 or 滑鼠移動用
     private Vector2 targetPosition = null;
     private float moveSpeed = 4f;
+
+    //斜方向移動用，2025430新增
+    public void moveWithDirection(float delta, Vector2 direction, float speed) {
+        // 如果正在進行滑鼠移動，則優先處理滑鼠移動
+        if (targetPosition != null) return;
+
+        if (direction.len() > 0) {
+            direction.nor();
+        }
+        move(direction.x * speed * delta, direction.y * speed * delta);
+
+        // 修改方向判斷邏輯：斜向移動時優先顯示側面動畫
+        if (Math.abs(direction.x) > 0.5f) {  // 當水平分量較大時
+            setFacing(direction.x > 0 ? FacingDirection.RIGHT : FacingDirection.LEFT);
+        } else if (direction.y != 0) {  // 否則才考慮垂直方向
+            setFacing(direction.y > 0 ? FacingDirection.UP : FacingDirection.DOWN);
+        }
+    }
+
     // 添加移動到目標位置的方法
     public void moveTo(float x, float y) {
         if (targetPosition == null) {
@@ -106,10 +132,12 @@ public class Character {
         );
     }
 
+    // 修改現有的 update 方法
     public void update(float delta, boolean isMoving) {
         if (isMoving) {
             state = State.WALKING;
             stateTime += delta;
+            // 立即更新動畫幀（移除緩衝）
             sprite.setRegion(getCurrentAnimationFrame());
         } else {
             state = State.STANDING;
