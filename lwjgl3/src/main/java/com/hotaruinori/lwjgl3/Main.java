@@ -15,8 +15,8 @@ import com.badlogic.gdx.utils.viewport.FitViewport;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
-    private Texture backgroundTexture;
     private Music music;
+    private InfiniteBackground infiniteBackground;
 
     //渲染相關
     private SpriteBatch spriteBatch;
@@ -31,7 +31,7 @@ public class Main implements ApplicationListener {
     @Override
     public void create() {
         //初始化基礎資源
-        backgroundTexture = new Texture("background.png");
+        infiniteBackground = new InfiniteBackground("background.png");
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -100,11 +100,11 @@ public class Main implements ApplicationListener {
         float worldHeight = viewport.getWorldHeight();
 
         // 限制角色移動範圍
-        character.getSprite().setX(MathUtils.clamp(
-            character.getX(),
-            0,
-            worldWidth - character.getWidth()
-        ));
+//        character.getSprite().setX(MathUtils.clamp(
+//            character.getX(),
+//            0,
+//            worldWidth - character.getWidth()
+//        ));
 
         // 更新角色碰撞框
         characterRectangle.set(
@@ -121,6 +121,11 @@ public class Main implements ApplicationListener {
 
     private void draw() {
         ScreenUtils.clear(Color.BLACK);
+        // 更新攝影機位置：讓它跟隨角色
+        Vector2 center = character.getCenterPosition();
+        viewport.getCamera().position.set(center.x, center.y, 0);
+        viewport.getCamera().update();
+        // 更新攝影機
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
         spriteBatch.begin();
@@ -128,7 +133,7 @@ public class Main implements ApplicationListener {
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
 
-        spriteBatch.draw(backgroundTexture, 0, 0, worldWidth, worldHeight);
+        infiniteBackground.render(spriteBatch, character.getCenterPosition(), worldWidth, worldHeight);
         character.getSprite().draw(spriteBatch);
         rainDrops.render(spriteBatch);
 
@@ -145,7 +150,7 @@ public class Main implements ApplicationListener {
 
     @Override
     public void dispose() {
-        backgroundTexture.dispose();
+        infiniteBackground.dispose();
         music.dispose();
         spriteBatch.dispose();
         character.dispose();
