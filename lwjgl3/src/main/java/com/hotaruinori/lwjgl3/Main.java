@@ -27,6 +27,7 @@ public class Main implements ApplicationListener {
     private Vector2 touchPos;
     private Rectangle characterRectangle;
     private Projectiles rainDrops;
+    private BossA boss1;
 
     @Override
     public void create() {
@@ -43,6 +44,9 @@ public class Main implements ApplicationListener {
 
         // 初始化投射物系統
         rainDrops = new Projectiles("drop.png", "drop.mp3", 0.5f, 4f);
+
+        //初始化怪物
+        boss1 = new BossA();
 
         // 其他物件
         touchPos = new Vector2();
@@ -134,6 +138,8 @@ public class Main implements ApplicationListener {
         float worldHeight = viewport.getWorldHeight();
 
         infiniteBackground.render(spriteBatch, character.getCenterPosition(), worldWidth, worldHeight);
+        // 更新怪物
+        boss1.render(spriteBatch); // 將 batch 傳遞給 BossA 的 render 方法
         character.getSprite().draw(spriteBatch);
         rainDrops.render(spriteBatch);
 
@@ -155,5 +161,6 @@ public class Main implements ApplicationListener {
         spriteBatch.dispose();
         character.dispose();
         rainDrops.dispose();
+        boss1.dispose();
     }
 }

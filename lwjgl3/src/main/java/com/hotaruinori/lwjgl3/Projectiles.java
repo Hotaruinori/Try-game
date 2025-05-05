@@ -84,8 +84,8 @@ public class Projectiles {
         // 計算投射方向向量
         Vector2 direction = new Vector2(targetWorldPos).sub(characterCenter).nor();
 
-        // 設定投射物旋轉角度（使其尖端朝角色）
-        float angleDeg = direction.angleDeg() + 180;
+        // 設定投射物旋轉角度（使其尖端朝角色），還需要再修正
+        float angleDeg = direction.angleDeg() + 90;
         projectile.setRotation(angleDeg);
 
         // 偷吃步：用 scale 儲存方向速度（之後移動會乘 delta）

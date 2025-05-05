@@ -102,7 +102,7 @@ public class Character {
         initAnimations();
         // 使用站立動畫的第一幀初始化精靈
         sprite = new Sprite(standingFrames[FacingDirection.DOWN.ordinal()]);
-        sprite.setSize(1, 1);
+        sprite.setSize(0.5f, 0.5f);
     }
 
     private void initAnimations() {
