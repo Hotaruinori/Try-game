@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap; // 繪製血條用
 
@@ -29,6 +30,9 @@ public class Character {
     // 單像素白色貼圖用於繪製血條
     private static Texture whiteTexture;
 
+    // 阻擋物件陣列（用於碰撞檢查）
+    private Rectangle[] blockingObjects = new Rectangle[0];  // 預設為空陣列
+
     static {
         Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
         pixmap.setColor(1, 1, 1, 1);
@@ -43,6 +47,7 @@ public class Character {
     private Animation<TextureRegion> walkLeftAnimation;
     private Animation<TextureRegion> walkRightAnimation;
     private TextureRegion[] standingFrames;
+
     // 角色中心點
     public Vector2 getCenterPosition() {
         return new Vector2(
@@ -55,7 +60,12 @@ public class Character {
     private Vector2 targetPosition = null;
     private float moveSpeed = 4f;
 
-    //斜方向移動用，2025430新增
+    // 設定阻擋物件陣列（由外部設定）
+    public void setBlockingObjects(Rectangle[] blockingObjects) {
+        this.blockingObjects = blockingObjects;
+    }
+
+    // 斜方向移動用，2025430新增
     public void moveWithDirection(float delta, Vector2 direction, float speed) {
         // 如果正在進行滑鼠移動，則優先處理滑鼠移動
         if (targetPosition != null) return;
@@ -80,6 +90,7 @@ public class Character {
         }
         targetPosition.set(x, y);
     }
+
     // 更新移動邏輯
     public void updateMovement(float delta) {
         if (targetPosition != null) {
@@ -100,9 +111,8 @@ public class Character {
             float moveX = direction.x * moveSpeed * delta;
             float moveY = direction.y * moveSpeed * delta;
 
-            // 移動角色
-            sprite.translateX(moveX);
-            sprite.translateY(moveY);
+            // 使用內部阻擋物件檢查碰撞後移動
+            move(moveX, moveY);
 
             // 根據移動方向設置面向方向
             if (Math.abs(direction.x) > Math.abs(direction.y)) {
@@ -171,8 +181,20 @@ public class Character {
         }
     }
 
-    // 移動方法
+    // 修改：移動方法，加入碰撞檢查（使用內部 blockingObjects 陣列）
     public void move(float deltaX, float deltaY) {
+        float newX = sprite.getX() + deltaX;
+        float newY = sprite.getY() + deltaY;
+
+        // 預測移動後角色的新位置矩形
+        Rectangle futureBounds = new Rectangle(newX, newY, sprite.getWidth(), sprite.getHeight());
+
+        for (Rectangle objectBounds : blockingObjects) {
+            if (futureBounds.overlaps(objectBounds)) {
+                return; // 有碰撞就不移動
+            }
+        }
+
         sprite.translateX(deltaX);
         sprite.translateY(deltaY);
     }
@@ -218,6 +240,7 @@ public class Character {
         sprite.draw(batch);
         drawHealthBar(batch);
     }
+
     private void drawHealthBar(SpriteBatch batch) {
         float barWidth = sprite.getWidth();                // 血條寬度 = 角色寬度
         float barHeight = 0.05f;                           // 血條高度 = 一個小值，適合顯示為細長條
@@ -247,10 +270,13 @@ public class Character {
     }
 
     public void dispose() {
-        // 釋放所有紋理資源
+        // 釋放所有靜態圖片資源
         for (TextureRegion frame : standingFrames) {
-            if (frame != null) frame.getTexture().dispose();
+            if (frame != null && frame.getTexture() != null) {
+                frame.getTexture().dispose(); // 釋放紋理
+            }
         }
+        // 釋放動畫資源
         disposeAnimation(walkUpAnimation);
         disposeAnimation(walkDownAnimation);
         disposeAnimation(walkLeftAnimation);

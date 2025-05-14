@@ -33,6 +33,8 @@ public class Main implements ApplicationListener {
     public void create() {
         //初始化基礎資源
         infiniteBackground = new InfiniteBackground("background.png");
+        // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
+        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 20f); // 參數可調整範圍
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -41,6 +43,7 @@ public class Main implements ApplicationListener {
 
         // 初始化角色
         character = new Character();
+        character.setBlockingObjects(infiniteBackground.getBlockingObjects());
 
         // 初始化投射物系統
         rainDrops = new Projectiles("drop.png", "drop.mp3", 0.5f, 4f);
