@@ -71,8 +71,8 @@ public class Projectiles {
 
     // 負責生成新的投射物
     public void spawnProjectile(Vector2 characterCenter, Vector2 targetWorldPos) {
-        float width = 1f;
-        float height = 1f;
+        float width = 0.5f;
+        float height = 0.5f;
 
         Sprite projectile = new Sprite(projectileTexture);
         projectile.setSize(width, height);

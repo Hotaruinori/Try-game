@@ -3,8 +3,10 @@ package com.hotaruinori.lwjgl3;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
+import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.graphics.Pixmap; // 繪製血條用
 
 public class Character {
     // 角色狀態枚舉
@@ -21,6 +23,19 @@ public class Character {
     private State state = State.STANDING;
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
+    // 血量初始
+    private int maxHealth = 100;   // 最大血量
+    private int currentHealth = 100;  // 當前血量
+    // 單像素白色貼圖用於繪製血條
+    private static Texture whiteTexture;
+
+    static {
+        Pixmap pixmap = new Pixmap(1, 1, Pixmap.Format.RGBA8888);
+        pixmap.setColor(1, 1, 1, 1);
+        pixmap.fill();
+        whiteTexture = new Texture(pixmap);
+        pixmap.dispose();
+    }
 
     // 鍵盤移動動畫資源
     private Animation<TextureRegion> walkUpAnimation;
@@ -187,6 +202,48 @@ public class Character {
 
     public float getHeight() {
         return sprite.getHeight();
+    }
+
+    public void takeDamage(int damage) {
+        currentHealth -= damage;
+        if (currentHealth < 0) currentHealth = 0;
+    }
+
+    public void heal(int amount) {
+        currentHealth += amount;
+        if (currentHealth > maxHealth) currentHealth = maxHealth;
+    }
+
+    public void render(SpriteBatch batch) {
+        sprite.draw(batch);
+        drawHealthBar(batch);
+    }
+    private void drawHealthBar(SpriteBatch batch) {
+        float barWidth = sprite.getWidth();                // 血條寬度 = 角色寬度
+        float barHeight = 0.05f;                           // 血條高度 = 一個小值，適合顯示為細長條
+        float x = sprite.getX();                           // 血條的起始 X 位置（跟角色左對齊）
+        float y = sprite.getY() - barHeight - 0.02f;       // 血條 Y 位置（在角色下方一點點）
+
+        float healthPercent = (float) currentHealth / maxHealth;   // 生命百分比（0~1）
+
+        // 背景條：灰色血條背景（表示滿血範圍）
+        batch.setColor(0.3f, 0.3f, 0.3f, 1f);    // 設成灰色
+        batch.draw(whiteTexture, x, y, barWidth, barHeight);
+
+        // 前景條：根據血量百分比決定顏色
+        if (healthPercent <= 0.3f) {
+            batch.setColor(1f, 0f, 0f, 1f);  // 紅色（低血）
+        } else if (healthPercent <= 0.7f) {
+            batch.setColor(1f, 1f, 0f, 1f);  // 黃色（中血）
+        } else {
+            batch.setColor(0f, 1f, 0f, 1f);  // 綠色（高血）
+        }
+
+        // 畫前景條（血量）
+        batch.draw(whiteTexture, x, y, barWidth * healthPercent, barHeight);
+
+        // 還原顏色（避免影響後續繪圖）
+        batch.setColor(1f, 1f, 1f, 1f);
     }
 
     public void dispose() {

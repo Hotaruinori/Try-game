@@ -138,9 +138,9 @@ public class Main implements ApplicationListener {
         float worldHeight = viewport.getWorldHeight();
 
         infiniteBackground.render(spriteBatch, character.getCenterPosition(), worldWidth, worldHeight);
-        // 更新怪物
+        // 更新怪物、角色與子彈
         boss1.render(spriteBatch); // 將 batch 傳遞給 BossA 的 render 方法
-        character.getSprite().draw(spriteBatch);
+        character.render(spriteBatch);
         rainDrops.render(spriteBatch);
 
         spriteBatch.end();
