@@ -29,12 +29,13 @@ public class Main implements ApplicationListener {
     private Projectiles rainDrops;
     private BossA boss1;
 
+
     @Override
     public void create() {
         //初始化基礎資源
         infiniteBackground = new InfiniteBackground("background.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
-        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 20f); // 參數可調整範圍
+        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 15f); // 參數可調整範圍
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -50,6 +51,7 @@ public class Main implements ApplicationListener {
 
         //初始化怪物
         boss1 = new BossA();
+        boss1.setPlayer(character);  //初始化追蹤位置並將"玩家的位置"傳給怪物的class
 
         // 其他物件
         touchPos = new Vector2();

@@ -181,7 +181,7 @@ public class Character {
         }
     }
 
-    // 修改：移動方法，加入碰撞檢查（使用內部 blockingObjects 陣列）
+    // 修改：移動方法，加入碰撞檢查（使用 blockingObjects 陣列）
     public void move(float deltaX, float deltaY) {
         float newX = sprite.getX() + deltaX;
         float newY = sprite.getY() + deltaY;
