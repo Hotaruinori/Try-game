@@ -5,9 +5,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.audio.Music;
 import com.badlogic.gdx.graphics.Color;
-import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
-import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
@@ -35,7 +33,6 @@ public class Main implements ApplicationListener {
         //初始化基礎資源
         infiniteBackground = new InfiniteBackground("background.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
-//        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 15f); // 參數可調整範圍
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -47,7 +44,7 @@ public class Main implements ApplicationListener {
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());
 
         // 初始化投射物系統
-        rainDrops = new Projectiles("drop.png", "drop.mp3", 0.5f, 4f);
+        rainDrops = new Projectiles("drop.png", "drop.mp3");
 
         //初始化怪物
         boss1 = new BossA();
@@ -140,8 +137,10 @@ public class Main implements ApplicationListener {
         // 更新怪物、角色與子彈
         boss1.render(spriteBatch); // 將 batch 傳遞給 BossA 的 render 方法
         character.render(spriteBatch);
+        //更新角色座標與地圖物件碰撞判定
         infiniteBackground.generateChunksAround(character.getCenterPosition(), 1); //
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());// 或其他範圍大小
+        //更新子彈
         rainDrops.render(spriteBatch);
 
         spriteBatch.end();

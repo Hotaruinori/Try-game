@@ -11,6 +11,12 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Projectiles {
+    //可調整參數，圖片與聲音要到main去調整
+    float PROJECTILE_WIDTH = 0.5f;  //投射物寬度
+    float PROJECTILE_HEIGHT = 0.5f; //投射物高度
+    float SPAWN_INTERVAL = 0.5f;    //發射間隔
+    float PROJECTILE_SPEED = 4.0f;  //投射物飛行速度
+
     private Texture projectileTexture;
     private Sound hitSound;
     private Array<Sprite> projectiles;
@@ -19,13 +25,13 @@ public class Projectiles {
     private float spawnInterval;
     private float projectileSpeed;
 
-    public Projectiles(String texturePath, String soundPath, float spawnInterval, float projectileSpeed) {
+    public Projectiles(String texturePath, String soundPath) {
         this.projectileTexture = new Texture(texturePath);
         this.hitSound = Gdx.audio.newSound(Gdx.files.internal(soundPath));
         this.projectiles = new Array<>();
         this.projectileRectangle = new Rectangle();
-        this.spawnInterval = spawnInterval;
-        this.projectileSpeed = projectileSpeed;
+        this.spawnInterval = SPAWN_INTERVAL;
+        this.projectileSpeed = PROJECTILE_SPEED;
         this.spawnTimer = 0;
     }
 
@@ -71,8 +77,8 @@ public class Projectiles {
 
     // 負責生成新的投射物
     public void spawnProjectile(Vector2 characterCenter, Vector2 targetWorldPos) {
-        float width = 0.5f;
-        float height = 0.5f;
+        float width = PROJECTILE_WIDTH;
+        float height = PROJECTILE_HEIGHT;
 
         Sprite projectile = new Sprite(projectileTexture);
         projectile.setSize(width, height);

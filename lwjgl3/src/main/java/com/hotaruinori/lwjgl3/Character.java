@@ -10,6 +10,12 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap; // 繪製血條用
 
 public class Character {
+    // 可調整參數
+    float MAX_HEALTH = 100.0f;      //最大血量
+    float CURRENT_HEALTH = 100.0f;  //當前血量
+    float MOVE_SPEED = 4.0f;        //移動速度
+    float CHARACTER_HEIGHT = 0.5f;        //角色寬度
+    float CHARACTER_WIDTH = 0.5f;        //角色高度
     // 角色狀態枚舉
     public enum State {
         STANDING, WALKING
@@ -25,8 +31,8 @@ public class Character {
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
     // 血量初始
-    private float maxHealth = 100.0f;   // 最大血量
-    private float currentHealth = 100.0f;  // 當前血量
+    private float maxHealth = MAX_HEALTH;   // 最大血量
+    private float currentHealth = CURRENT_HEALTH;  // 當前血量
     // 單像素白色貼圖用於繪製血條
     private static Texture whiteTexture;
 
@@ -58,7 +64,7 @@ public class Character {
 
     // 觸碰 or 滑鼠移動用
     private Vector2 targetPosition = null;
-    private float moveSpeed = 4f;
+    private float moveSpeed = MOVE_SPEED;
 
     // 設定阻擋物件陣列（由外部設定）
     public void setBlockingObjects(Rectangle[] blockingObjects) {
@@ -127,7 +133,7 @@ public class Character {
         initAnimations();
         // 使用站立動畫的第一幀初始化精靈
         sprite = new Sprite(standingFrames[FacingDirection.DOWN.ordinal()]);
-        sprite.setSize(0.5f, 0.5f);
+        sprite.setSize(CHARACTER_WIDTH, CHARACTER_HEIGHT);
     }
 
     private void initAnimations() {
