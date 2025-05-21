@@ -49,7 +49,14 @@ public class InfiniteBackground {
         objectTypes.add(new BackgroundObjectType("bucket.png", false, true, true,0.05f, 0.5f));   // 招牌，不阻擋
     }
 
-    // ✅（新增）用來標記每個區塊的座標 key
+    // ✅（新增）用來標記每個區塊的座標 key(ChunkKey)，給後面的generateChunksAround方法使用。
+    // <不是 LibGDX 內建的東西> Java 的 HashMap 和 HashSet 這種集合，是用 雜湊值 (hashCode) + 比較 (equals) 來判斷兩個物件是否一樣的。
+    //當你把一個物件當作 Map 的 key（像 Map<ChunkKey, ChunkData>）時：
+    //hashCode()：決定這個 key 落在哪個 「桶子」。
+    //equals()：當兩個物件的 hash 相同，會再用 .equals() 去確認是不是「真的一樣」。
+    //如果沒有實作這兩個方法，Java 只會檢查「是不是同一個物件」，而不是「值是否一樣」
+    //在 Java 中，所有類別都（直接或間接）繼承自 java.lang.Object。
+    // 預設 .equals()：只會比是不是「同一個記憶體位置」; 預設 .hashCode()：回傳記憶體位置的雜湊值（差不多是地址）
     private static class ChunkKey {
         int chunkX, chunkY;
 
@@ -63,7 +70,7 @@ public class InfiniteBackground {
             if (this == o) return true;
             if (!(o instanceof ChunkKey)) return false;
             ChunkKey other = (ChunkKey) o;
-            return chunkX == other.chunkX && chunkY == other.chunkY;
+            return this.chunkX == other.chunkX && this.chunkY == other.chunkY;
         }
 
         @Override
@@ -84,27 +91,31 @@ public class InfiniteBackground {
     // ✅（新增）區塊大小設定為 10x10 單位
     private final int CHUNK_SIZE = 10;
 
-    // ✅（新增）生成角色周圍的所有區塊（範圍可設定）
+    // ✅（新增）generateChunksAround() 方法是「無限地圖背景生成系統」的核心之一，
+    // 它會根據角色的位置來決定要載入哪些區塊（chunk），並且自動產生或取出記憶中的區塊資料，將對應的物件加入渲染與碰撞清單中。
+    // Vector2 center: 表示角色目前的位置（世界座標）;int rangeInChunks: 表示以角色為中心，要載入幾個區塊的範圍，例如 1 就是 3x3（中心 + 上下左右各 1）。
     public void generateChunksAround(Vector2 center, int rangeInChunks) {
+        //根據角色目前的位置，計算出它目前所在的「區塊座標」例如角色在 (25, 37)，若 CHUNK_SIZE = 10，則會對應到區塊 (2, 3)
         int centerChunkX = (int) Math.floor(center.x / CHUNK_SIZE);
         int centerChunkY = (int) Math.floor(center.y / CHUNK_SIZE);
-
+        //在重新產生區塊前，先清除畫面上原本的物件與碰撞資料
         backgroundObjects.clear();        // ⚠️ 注意這裡是合併所有 chunk 的物件進背景
         blockingObjectsBounds.clear();
-
+        //遍歷周圍的所有區塊（以角色為中心）
         for (int dx = -rangeInChunks; dx <= rangeInChunks; dx++) {
             for (int dy = -rangeInChunks; dy <= rangeInChunks; dy++) {
+                //計算目前區塊的座標與對應 key，chunkX 與 chunkY 是這次要處理的實際區塊座標
                 int chunkX = centerChunkX + dx;
                 int chunkY = centerChunkY + dy;
+                //ChunkKey 是自定的 key 類別，用來作為 Map 裡 generatedChunks 的 key（要實作 .equals() 和 .hashCode()）。
                 ChunkKey key = new ChunkKey(chunkX, chunkY);
-
+                //嘗試從記憶體取出區塊資料，若無則新生成
                 ChunkData data = generatedChunks.get(key);
                 if (data == null) {
                     data = generateChunk(chunkX, chunkY);
                     generatedChunks.put(key, data);
                 }
-
-                // 將此 chunk 的物件加入渲染與碰撞列表
+                // 將此 chunk 區塊中的物件加入目前渲染與碰撞清單
                 backgroundObjects.addAll(data.objects);
                 blockingObjectsBounds.addAll(data.blockingBounds);
             }
