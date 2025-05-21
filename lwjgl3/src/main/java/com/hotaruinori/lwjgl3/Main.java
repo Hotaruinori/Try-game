@@ -35,7 +35,7 @@ public class Main implements ApplicationListener {
         //初始化基礎資源
         infiniteBackground = new InfiniteBackground("background.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
-        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 15f); // 參數可調整範圍
+//        infiniteBackground.generateRandomObjectsAround(new Vector2(0, 0), 15f); // 參數可調整範圍
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
         //初始化渲染系統
@@ -108,12 +108,6 @@ public class Main implements ApplicationListener {
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
 
-        // 限制角色移動範圍
-//        character.getSprite().setX(MathUtils.clamp(
-//            character.getX(),
-//            0,
-//            worldWidth - character.getWidth()
-//        ));
 
         // 更新角色碰撞框
         characterRectangle.set(
@@ -146,6 +140,8 @@ public class Main implements ApplicationListener {
         // 更新怪物、角色與子彈
         boss1.render(spriteBatch); // 將 batch 傳遞給 BossA 的 render 方法
         character.render(spriteBatch);
+        infiniteBackground.generateChunksAround(character.getCenterPosition(), 1); //
+        character.setBlockingObjects(infiniteBackground.getBlockingObjects());// 或其他範圍大小
         rainDrops.render(spriteBatch);
 
         spriteBatch.end();

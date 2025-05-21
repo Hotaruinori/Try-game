@@ -25,8 +25,8 @@ public class Character {
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
     // 血量初始
-    private int maxHealth = 100;   // 最大血量
-    private int currentHealth = 100;  // 當前血量
+    private float maxHealth = 100.0f;   // 最大血量
+    private float currentHealth = 100.0f;  // 當前血量
     // 單像素白色貼圖用於繪製血條
     private static Texture whiteTexture;
 
@@ -226,12 +226,12 @@ public class Character {
         return sprite.getHeight();
     }
 
-    public void takeDamage(int damage) {
+    public void takeDamage(float damage) {
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
     }
 
-    public void heal(int amount) {
+    public void heal(float amount) {
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
     }
