@@ -21,10 +21,19 @@ public class InfiniteBackground {
     private static class BackgroundObjectType {
         Texture texture;
         boolean isBlocking;
+        boolean allowRandomSize;  // ➕ 是否允許隨機大小
+        boolean allowRotation;    // ➕ 是否允許旋轉
+        float density;       // ➕ 每個單位面積的物件密度（例如 0.2 表示每 1 單位面積期望 0.2 個）
+        float probability;   // ➕ 每次嘗試時的物件生成機率（例如 0.6 表示 60% 機率會放）
 
-        BackgroundObjectType(String texturePath, boolean isBlocking) {
+        BackgroundObjectType(String texturePath, boolean isBlocking,
+                             boolean allowRandomSize, boolean allowRotation, float density, float probability) {
             this.texture = new Texture(texturePath);
             this.isBlocking = isBlocking;
+            this.allowRandomSize = allowRandomSize;
+            this.allowRotation = allowRotation;
+            this.density = density;
+            this.probability = probability;
         }
     }
 
@@ -33,11 +42,11 @@ public class InfiniteBackground {
     public InfiniteBackground(String tileTexturePath) {
         texture = new Texture(tileTexturePath); // 載入地磚圖片
 
-        // ➕ 載入各種背景物件圖片，並指定其是否阻擋
-        objectTypes.add(new BackgroundObjectType("box.png", true));       // 樹，阻擋
-        objectTypes.add(new BackgroundObjectType("box.png", true));       // 石頭，阻擋
-        objectTypes.add(new BackgroundObjectType("bucket.png", false));   // 草叢，不阻擋
-        objectTypes.add(new BackgroundObjectType("bucket.png", false));   // 招牌，不阻擋
+        // ➕ 將各種背景物件加入objectTypes，可指定圖片、是否阻擋人物，是否隨機大小，是否旋轉、物件密度、生成機率
+        objectTypes.add(new BackgroundObjectType("box.png", true, true, true,0.1f, 0.7f));       // 樹，阻擋
+        objectTypes.add(new BackgroundObjectType("rock_hat.png", true,false, false,0.5f, 0.7f));  // 石頭，阻擋
+        objectTypes.add(new BackgroundObjectType("bucket.png", false, true, true,0.05f, 0.5f));   // 草叢，不阻擋
+        objectTypes.add(new BackgroundObjectType("bucket.png", false, true, true,0.05f, 0.5f));   // 招牌，不阻擋
     }
 
     // ✅（新增）用來標記每個區塊的座標 key
@@ -102,31 +111,54 @@ public class InfiniteBackground {
         }
     }
 
-    // ✅（新增）實際生成一個區塊的物件
+    // ✅（新增）實際生成一個區塊的地圖物件，關鍵
     private ChunkData generateChunk(int chunkX, int chunkY) {
+        //ChunkData 是一個自訂類別，用來儲存這個區塊的所有物件（Sprite）和碰撞阻擋邊界（Rectangle）
         ChunkData data = new ChunkData();
+        //chunkOriginX 和 chunkOriginY 計算出這個區塊在世界地圖中的左下角絕對座標。
+        //例如：第 (2, 3) 區塊的左下角就是 (20, 30)（如果 CHUNK_SIZE = 10）
+        float chunkOriginX = chunkX * CHUNK_SIZE;
+        float chunkOriginY = chunkY * CHUNK_SIZE;
 
-        int objectCount = 8 + MathUtils.random(5);  // 每個區塊可以自訂密度
+        //針對每一種物件類型開始嘗試生成，每種物件都可以有自己的密度、機率、尺寸、旋轉等設定
+        for (BackgroundObjectType type : objectTypes) {
+            // 密度 density代表「這種類型物件在區塊中的預期密度」，這邊的參數決定該物件類型要嘗試生成幾次。
+            //這裡用 *10 代表這種物件類型的嘗試次數上限（根據實測再調整這個數字）。
+            //例如：density = 0.3，那就是 0.3 * 10 = 3，最多會嘗試生成 3 個該類型物件。
+            int maxCount = MathUtils.ceil(type.density * 10);
+            //機率 probability決定是否真正生成該物件
+            for (int i = 0; i < maxCount; i++) {
+                //如果隨機值random()超過機率probability，跳過這次生成。
+                // MathUtils.random() 會生成一個 0~1 之間的亂數。type.probability 是一個 0~1 的機率值。
+                if (MathUtils.random() > type.probability) continue;
 
-        for (int i = 0; i < objectCount; i++) {
-            float x = chunkX * CHUNK_SIZE + MathUtils.random(0f, CHUNK_SIZE);
-            float y = chunkY * CHUNK_SIZE + MathUtils.random(0f, CHUNK_SIZE);
+                // 在整個區塊中亂數產生一個位置。
+                // 假設 chunk 是 10x10 單位，那這個位置就會在 (chunkX*10 ~ chunkX*10+10) 和 (chunkY*10 ~ chunkY*10+10) 之間
+                float x = chunkOriginX + MathUtils.random(0f, CHUNK_SIZE);
+                float y = chunkOriginY + MathUtils.random(0f, CHUNK_SIZE);
+                // 產生物件
+                Sprite obj = new Sprite(type.texture);
 
-            BackgroundObjectType type = objectTypes.get(MathUtils.random(objectTypes.size() - 1));
-            Sprite obj = new Sprite(type.texture);
+                // 依照是否允許隨機大小設定尺寸，並設定預設值
+                float width = type.allowRandomSize ? MathUtils.random(0.4f, 0.8f) : 0.6f;
+                float height = type.allowRandomSize ? MathUtils.random(0.4f, 0.8f) : 0.6f;
+                // 設定物件的實際大小與位置，並把旋轉中心設在正中央。
+                obj.setSize(width, height);
+                obj.setOriginCenter();
+                obj.setPosition(x - width / 2, y - height / 2);
 
-            float width = MathUtils.random(0.4f, 0.8f);
-            float height = MathUtils.random(0.4f, 0.8f);
+                // 依照是否允許旋轉決定是否隨機旋轉
+                if (type.allowRotation) {
+                    obj.setRotation(MathUtils.random(0, 360));
+                }
 
-            obj.setSize(width, height);
-            obj.setOriginCenter();
-            obj.setPosition(x - width / 2, y - height / 2);
-            obj.setRotation(MathUtils.random(0, 360));
+                // 加入物件到data(ChunkData)
+                data.objects.add(obj);
 
-            data.objects.add(obj);
-
-            if (type.isBlocking) {
-                data.blockingBounds.add(new Rectangle(obj.getX(), obj.getY(), obj.getWidth(), obj.getHeight()));
+                // 如果此物件是阻擋型，加入碰撞邊界資料
+                if (type.isBlocking) {
+                    data.blockingBounds.add(new Rectangle(obj.getX(), obj.getY(), obj.getWidth(), obj.getHeight()));
+                }
             }
         }
 
@@ -168,7 +200,7 @@ public class InfiniteBackground {
         return false;
     }
 
-    // ✅ 新增：取得所有阻擋型物件的 Rectangle 陣列，提供給角色做碰撞檢查用
+    // 取得所有阻擋型物件的 Rectangle 陣列，提供給角色做碰撞檢查用
     public Rectangle[] getBlockingObjects() {
         return blockingObjectsBounds.toArray(new Rectangle[0]);
     }
