@@ -132,7 +132,22 @@ public class Projectiles {
     }
     //用於給main設定投射物數量用。如：projectiles.setProjectileCount(5);
     public void setProjectileCount(int count) {
-        this.projectileCount = Math.max(1, count); // 最少一發
+        this.projectileCount = Math.max(PROJECTILE_COUNT, count); // 最少一發(預設值)
+    }
+    //用於給main設定投射物數量用。如：projectiles.setProjectileSpeed(10.0f);
+    public void setProjectileSpeed(float speed) {
+        this.projectileSpeed = Math.max(PROJECTILE_SPEED, speed); // 最慢4.0(預設值)
+    }
+    //用於給main設定投射物數量用。如：projectiles.setSpawnInterval(0.2f);
+    public void setSpawnInterval(float spawn) {
+        this.spawnInterval = Math.min(SPAWN_INTERVAL, spawn); // 最多0.5(預設值)
+    }
+    //用於給main設定投射物範圍大小用。如：projectiles.setSpawnInterval(0.2f);
+    // 設定投射物的寬度與高度，兩者同時變更（不得小於 0.1f）
+    public void setProjectileSize(float size) {
+        float clampedSize = Math.max(0.5f, size); // 避免比預設 0.5 小或負數
+        this.PROJECTILE_WIDTH = clampedSize;
+        this.PROJECTILE_HEIGHT = clampedSize;
     }
 
     // 檢查投射物是否超出攝影機視野邊界

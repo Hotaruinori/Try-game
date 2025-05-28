@@ -43,9 +43,12 @@ public class Main implements ApplicationListener {
         character = new Character();
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());
 
-        // 初始化投射物系統
+        // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
-        rainDrops.setProjectileCount(5);  //設定投射物數量
+        rainDrops.setProjectileCount(5);  //設定投射物數量，後續放進升級系統
+        rainDrops.setProjectileSpeed(10.0f);  //設定投射物速度，後續放進升級系統
+        rainDrops.setSpawnInterval(0.1f);  //設定投射物發射間隔，後續放進升級系統
+        rainDrops.setProjectileSize(1.0f);  //設定投射物發射間隔，後續放進升級系統
 
         //初始化怪物
         boss1 = new BossA();
