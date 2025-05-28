@@ -20,7 +20,7 @@ public class Projectiles {
 
     //宣告物件
     private Texture projectileTexture;  //儲存投射物使用的圖片材質（Texture 是圖片素材的基本單位）
-    private Sound hitSound;             //播放的音效
+    private Sound hitSound;             //發射播放的音效
     private Array<ProjectileInstance> projectiles; // 用來儲存目前場上所有的投射物實體，每個包含 Sprite 與速度向量
     private float spawnTimer;           //記錄時間累加，用來決定何時產生下一個投射物。
     private Rectangle projectileRectangle; //暫存矩形，用於未來可能進行的碰撞偵測

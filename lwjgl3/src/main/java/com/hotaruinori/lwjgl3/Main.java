@@ -27,6 +27,9 @@ public class Main implements ApplicationListener {
     private Projectiles rainDrops;
     private BossA boss1;
 
+    //暫停選單
+    private PauseMenu pauseMenu;
+
 
     @Override
     public void create() {
@@ -62,6 +65,8 @@ public class Main implements ApplicationListener {
         music.setLooping(true);
         music.setVolume(.5f);
         music.play();
+        //暫停選單
+        pauseMenu = new PauseMenu();
     }
 
     @Override
@@ -71,9 +76,26 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        input();
-        logic();
-        draw();
+        // 處理 ESC 鍵：按一下切換暫停/恢復
+        if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
+            if (pauseMenu.isVisible()) {
+                pauseMenu.hide();
+            } else {
+                pauseMenu.show(() -> {
+                    pauseMenu.hide(); // Resume 遊戲
+                }, () -> {
+                    Gdx.app.exit(); // Exit 遊戲
+                });
+            }
+        }
+
+        if (!pauseMenu.isVisible()) {
+            input();
+            logic();
+        }
+
+        draw(); // draw 你自己遊戲畫面
+        pauseMenu.render(); // 最後畫上 pauseMenu
     }
 
     private void input() {
@@ -118,9 +140,10 @@ public class Main implements ApplicationListener {
             character.getHeight()
         );
 
-
         // 更新投射物
         rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character);
+        //更新怪物
+        boss1.update(Gdx.graphics.getDeltaTime());
     }
 
     private void draw() {

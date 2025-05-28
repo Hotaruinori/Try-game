@@ -42,7 +42,7 @@ public class BossA {
 //        posX += inputPro.X_SPD * Gdx.graphics.getDeltaTime(); //X的位置
 //        posY += inputPro.Y_SPD * Gdx.graphics.getDeltaTime(); //Y的位置
 
-        update(Gdx.graphics.getDeltaTime());
+//        update(Gdx.graphics.getDeltaTime());
         batch.draw(bossSprite, posX, posY,2f,2f);
 
 
