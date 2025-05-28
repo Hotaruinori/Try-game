@@ -189,5 +189,6 @@ public class Main implements ApplicationListener {
         character.dispose();
         rainDrops.dispose();
         boss1.dispose();
+        pauseMenu.dispose();
     }
 }
