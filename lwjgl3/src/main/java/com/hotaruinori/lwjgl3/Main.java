@@ -45,6 +45,7 @@ public class Main implements ApplicationListener {
 
         // 初始化投射物系統
         rainDrops = new Projectiles("drop.png", "drop.mp3");
+        rainDrops.setProjectileCount(5);  //設定投射物數量
 
         //初始化怪物
         boss1 = new BossA();

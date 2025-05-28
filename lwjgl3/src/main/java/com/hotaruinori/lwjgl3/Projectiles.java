@@ -16,6 +16,7 @@ public class Projectiles {
     float PROJECTILE_HEIGHT = 0.5f; // 投射物高度
     float SPAWN_INTERVAL = 0.5f;    // 發射間隔
     float PROJECTILE_SPEED = 4.0f;  // 投射物飛行速度
+    int PROJECTILE_COUNT = 1;        // 每次發射的投射物數量（可自由調整）
 
     //宣告物件
     private Texture projectileTexture;  //儲存投射物使用的圖片材質（Texture 是圖片素材的基本單位）
@@ -25,6 +26,7 @@ public class Projectiles {
     private Rectangle projectileRectangle; //暫存矩形，用於未來可能進行的碰撞偵測
     private float spawnInterval;           // 發射間隔
     private float projectileSpeed;        // 投射物飛行速度
+    private int projectileCount;          // 每次發射的投射物數量
 
     // 用來記錄每個投射物的 Sprite 和移動速度向量
     private static class ProjectileInstance {
@@ -45,6 +47,7 @@ public class Projectiles {
         this.spawnInterval = SPAWN_INTERVAL;
         this.projectileSpeed = PROJECTILE_SPEED;
         this.spawnTimer = 0;
+        this.projectileCount = PROJECTILE_COUNT;
     }
 
     public void update(float delta, Rectangle characterRect, Viewport viewport, Character character) {
@@ -96,26 +99,40 @@ public class Projectiles {
         float width = PROJECTILE_WIDTH;
         float height = PROJECTILE_HEIGHT;
 
-        Sprite projectile = new Sprite(projectileTexture);
-        projectile.setSize(width, height);
-        projectile.setOriginCenter();
+        // 計算主方向向量（滑鼠朝向）
+        Vector2 baseDirection = new Vector2(targetWorldPos).sub(characterCenter).nor();
 
-        // 從角色中心發射
-        projectile.setPosition(characterCenter.x - width / 2, characterCenter.y - height / 2);
+        // 多發投射物時，讓每顆彈偏轉一定角度
+        float angleStep = 15f; // 每顆彈偏轉的角度（度數）
+        float startAngle = -(angleStep * (projectileCount - 1) / 2f); // 從負角度往右偏
 
-        // 計算投射方向向量，sub()：用滑鼠位置 - 角色中心位置，得到方向向量。nor()：將向量標準化（長度變成 1），這樣可以方便設定速度。
-        Vector2 direction = new Vector2(targetWorldPos).sub(characterCenter).nor();
+        for (int i = 0; i < projectileCount; i++) {
+            // 將主方向旋轉一定角度產生新方向
+            Vector2 rotatedDir = new Vector2(baseDirection).rotateDeg(startAngle + i * angleStep);
+            Vector2 velocity = new Vector2(rotatedDir).scl(projectileSpeed); // 單位速度向量 x 飛行速度
 
-        // 設定投射物旋轉角度（使其尖端朝角色）
-        float angleDeg = direction.angleDeg() + 90; // 加 90 是因為圖片尖端朝上（視素材而定）
-        projectile.setRotation(angleDeg);
+            Sprite projectile = new Sprite(projectileTexture);
+            projectile.setSize(width, height);
+            projectile.setOriginCenter();
+            projectile.setPosition(characterCenter.x - width / 2, characterCenter.y - height / 2);
 
-        // 計算實際速度向量（單位：距離/秒）。scl()：縮放向量，使它變成具備實際速度的向量>>例如方向是 (0.6, 0.8)，乘上速度 4 就會是 (2.4, 3.2)。
-        Vector2 velocity = direction.scl(projectileSpeed);
+            // 計算旋轉角度，讓圖片朝向飛行方向（+90 為了修正圖片方向）
+            float angleDeg = rotatedDir.angleDeg() + 90;
+            projectile.setRotation(angleDeg);
 
-        // 加入到投射物陣列中
-        projectiles.add(new ProjectileInstance(projectile, velocity));
+            // 正確使用建構子初始化實體（包含 sprite 與速度）
+            ProjectileInstance instance = new ProjectileInstance(projectile, velocity);
+
+            // 加入到投射物陣列中
+            projectiles.add(instance);
+        }
+
+        // 播放音效（一次發射只播放一次聲音）
         hitSound.play();
+    }
+    //用於給main設定投射物數量用。如：projectiles.setProjectileCount(5);
+    public void setProjectileCount(int count) {
+        this.projectileCount = Math.max(1, count); // 最少一發
     }
 
     // 檢查投射物是否超出攝影機視野邊界
