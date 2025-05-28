@@ -11,20 +11,32 @@ import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 public class Projectiles {
-    //可調整參數，圖片與聲音要到main去調整
-    float PROJECTILE_WIDTH = 0.5f;  //投射物寬度
-    float PROJECTILE_HEIGHT = 0.5f; //投射物高度
-    float SPAWN_INTERVAL = 0.5f;    //發射間隔
-    float PROJECTILE_SPEED = 4.0f;  //投射物飛行速度
+    // 可調整參數，圖片與聲音要到 main 去調整
+    float PROJECTILE_WIDTH = 0.5f;  // 投射物寬度
+    float PROJECTILE_HEIGHT = 0.5f; // 投射物高度
+    float SPAWN_INTERVAL = 0.5f;    // 發射間隔
+    float PROJECTILE_SPEED = 4.0f;  // 投射物飛行速度
 
-    private Texture projectileTexture;
-    private Sound hitSound;
-    private Array<Sprite> projectiles;
-    private float spawnTimer;
-    private Rectangle projectileRectangle;
-    private float spawnInterval;
-    private float projectileSpeed;
+    //宣告物件
+    private Texture projectileTexture;  //儲存投射物使用的圖片材質（Texture 是圖片素材的基本單位）
+    private Sound hitSound;             //播放的音效
+    private Array<ProjectileInstance> projectiles; // 用來儲存目前場上所有的投射物實體，每個包含 Sprite 與速度向量
+    private float spawnTimer;           //記錄時間累加，用來決定何時產生下一個投射物。
+    private Rectangle projectileRectangle; //暫存矩形，用於未來可能進行的碰撞偵測
+    private float spawnInterval;           // 發射間隔
+    private float projectileSpeed;        // 投射物飛行速度
 
+    // 用來記錄每個投射物的 Sprite 和移動速度向量
+    private static class ProjectileInstance {
+        Sprite sprite;       // 投射物本體(Sprite)
+        Vector2 velocity;    // 速度向量（單位：距離/秒）（Vector2）
+
+        ProjectileInstance(Sprite sprite, Vector2 velocity) {
+            this.sprite = sprite;
+            this.velocity = velocity;
+        }
+    }
+    // 提供給main.java呼叫的投射物create的方法，呼叫要有圖片與聲音路徑，功能請參照上方宣告物件。
     public Projectiles(String texturePath, String soundPath) {
         this.projectileTexture = new Texture(texturePath);
         this.hitSound = Gdx.audio.newSound(Gdx.files.internal(soundPath));
@@ -38,10 +50,13 @@ public class Projectiles {
     public void update(float delta, Rectangle characterRect, Viewport viewport, Character character) {
         // 更新每一個投射物的位置與判斷是否離開畫面
         for (int i = projectiles.size - 1; i >= 0; i--) {
-            Sprite projectile = projectiles.get(i);
+            ProjectileInstance instance = projectiles.get(i);
+            Sprite projectile = instance.sprite;
+            Vector2 velocity = instance.velocity;
 
-            // 以 scale 代表速度方向向量，乘以 delta 更新位置
-            projectile.translate(projectile.getScaleX() * delta, projectile.getScaleY() * delta);
+            // 以 velocity 代表速度方向向量，乘以 delta 更新位置（速度是距離/秒，所以要乘上 delta 才是每幀位移）
+            // delta：每幀的時間差（秒），用來確保移動速度不受 FPS 影響
+            projectile.translate(velocity.x * delta, velocity.y * delta);
 
             // 更新暫存矩形用於碰撞判定或其他用途（這邊雖然沒用到）
             projectileRectangle.set(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
@@ -70,8 +85,9 @@ public class Projectiles {
     }
 
     public void render(SpriteBatch batch) {
-        for (Sprite projectile : projectiles) {
-            projectile.draw(batch);
+        // 渲染所有投射物
+        for (ProjectileInstance instance : projectiles) {
+            instance.sprite.draw(batch);
         }
     }
 
@@ -87,18 +103,18 @@ public class Projectiles {
         // 從角色中心發射
         projectile.setPosition(characterCenter.x - width / 2, characterCenter.y - height / 2);
 
-        // 計算投射方向向量
+        // 計算投射方向向量，sub()：用滑鼠位置 - 角色中心位置，得到方向向量。nor()：將向量標準化（長度變成 1），這樣可以方便設定速度。
         Vector2 direction = new Vector2(targetWorldPos).sub(characterCenter).nor();
 
-        // 設定投射物旋轉角度（使其尖端朝角色），還需要再修正
-        float angleDeg = direction.angleDeg() + 90;
+        // 設定投射物旋轉角度（使其尖端朝角色）
+        float angleDeg = direction.angleDeg() + 90; // 加 90 是因為圖片尖端朝上（視素材而定）
         projectile.setRotation(angleDeg);
 
-        // 偷吃步：用 scale 儲存方向速度（之後移動會乘 delta）
-        projectile.setScale(direction.x * projectileSpeed, direction.y * projectileSpeed);
+        // 計算實際速度向量（單位：距離/秒）。scl()：縮放向量，使它變成具備實際速度的向量>>例如方向是 (0.6, 0.8)，乘上速度 4 就會是 (2.4, 3.2)。
+        Vector2 velocity = direction.scl(projectileSpeed);
 
         // 加入到投射物陣列中
-        projectiles.add(projectile);
+        projectiles.add(new ProjectileInstance(projectile, velocity));
         hitSound.play();
     }
 
@@ -125,7 +141,7 @@ public class Projectiles {
         hitSound.dispose();
     }
 
-    public Array<Sprite> getProjectiles() {
+    public Array<ProjectileInstance> getProjectiles() {
         return projectiles;
     }
 }
