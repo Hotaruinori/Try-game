@@ -17,7 +17,7 @@ public class Projectiles {
     float SPAWN_INTERVAL = 0.5f;    // 發射間隔
     float PROJECTILE_SPEED = 4.0f;  // 投射物飛行速度
     int PROJECTILE_COUNT = 1;        // 每次發射的投射物數量（可自由調整）
-
+    float PROJECTILE_Damage = 1;    // 投射物傷害
     //宣告物件
     private Texture projectileTexture;  //儲存投射物使用的圖片材質（Texture 是圖片素材的基本單位）
     private Sound hitSound;             //發射播放的音效
@@ -27,6 +27,7 @@ public class Projectiles {
     private float spawnInterval;           // 發射間隔
     private float projectileSpeed;        // 投射物飛行速度
     private int projectileCount;          // 每次發射的投射物數量
+    private float projectiledamage;
 
     // 用來記錄每個投射物的 Sprite 和移動速度向量
     private static class ProjectileInstance {
@@ -50,7 +51,7 @@ public class Projectiles {
         this.projectileCount = PROJECTILE_COUNT;
     }
 
-    public void update(float delta, Rectangle characterRect, Viewport viewport, Character character) {
+    public void update(float delta, Rectangle characterRect, Viewport viewport, Character character, BossA boss1) {
         // 更新每一個投射物的位置與判斷是否離開畫面
         for (int i = projectiles.size - 1; i >= 0; i--) {
             ProjectileInstance instance = projectiles.get(i);
@@ -63,9 +64,14 @@ public class Projectiles {
 
             // 更新暫存矩形用於碰撞判定或其他用途（這邊雖然沒用到）
             projectileRectangle.set(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
-
-            // 若投射物超出視野範圍，則移除
-            if (isOutOfView(projectile, viewport)) {
+            // 檢查是否打中任何怪物
+            boolean hit = false;
+            if (projectileRectangle.overlaps(boss1.BossA_Rectangle())) {
+                boss1.takeDamage(projectiledamage); // 造成傷害
+                hit = true;
+            }
+            // 若投射物擊中或超出視野範圍，則移除
+            if (hit||isOutOfView(projectile, viewport)) {
                 projectiles.removeIndex(i);
             }
         }
@@ -148,6 +154,10 @@ public class Projectiles {
         float clampedSize = Math.max(0.5f, size); // 避免比預設 0.5 小或負數
         this.PROJECTILE_WIDTH = clampedSize;
         this.PROJECTILE_HEIGHT = clampedSize;
+    }
+    //用於給main設定投射物傷害用。如：projectiles.setSpawnInterval(0.2f);
+    public void setProjectileDamage(float damage) {
+        this.projectiledamage = Math.min(PROJECTILE_Damage, damage); // 最多0.5(預設值)
     }
 
     // 檢查投射物是否超出攝影機視野邊界

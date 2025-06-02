@@ -51,10 +51,11 @@ public class Main implements ApplicationListener {
 
         // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
-        rainDrops.setProjectileCount(1);  //設定投射物數量，後續放進升級系統
-        rainDrops.setProjectileSpeed(4.0f);  //設定投射物速度，後續放進升級系統
-        rainDrops.setSpawnInterval(0.5f);  //設定投射物發射間隔，後續放進升級系統
-        rainDrops.setProjectileSize(1.0f);  //設定投射物發射間隔，後續放進升級系統
+        rainDrops.setProjectileCount(5);  //設定投射物數量，後續放進升級系統
+        rainDrops.setProjectileSpeed(10.0f);  //設定投射物速度，後續放進升級系統
+        rainDrops.setSpawnInterval(0.1f);  //設定投射物發射間隔，後續放進升級系統
+        rainDrops.setProjectileSize(0.5f);  //設定投射物發射大小，後續放進升級系統
+        rainDrops.setProjectileDamage(10.0f);  //設定投射物發射傷害，後續放進升級系統
 
         //初始化怪物
         boss1 = new BossA();
@@ -149,7 +150,7 @@ public class Main implements ApplicationListener {
         );
 
         // 更新投射物
-        rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character);
+        rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character, boss1);
         //更新怪物
 //        boss1.update(Gdx.graphics.getDeltaTime());
     }

@@ -7,6 +7,7 @@ import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2; // 確保有這個 import
 import com.badlogic.gdx.utils.Array;
+import com.badlogic.gdx.math.Rectangle;  // 碰撞判定用
 
 public class BossA {
     private Sprite bossSprite;
@@ -124,6 +125,10 @@ public class BossA {
             // TODO: 可以考慮在這裡繪製 Boss 的血條
         }
 
+    }
+    // 怪物的碰撞判定用
+    public Rectangle BossA_Rectangle() {
+        return new Rectangle(posX+1/4f, posY+1/4f, monsterWidth*3/4f, monsterHeight*3/4f);
     }
     // --- 新增 Boss 受傷方法 ---
     public void takeDamage(float damageAmount) {
