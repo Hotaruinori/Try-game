@@ -10,6 +10,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
+import com.hotaruinori.lwjgl3.Attack.MissileManager;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
@@ -26,6 +27,8 @@ public class Main implements ApplicationListener {
     private Rectangle characterRectangle;
     private Projectiles rainDrops;
     private BossA boss1;
+    //5/31飛彈
+    private MissileManager missileManager;
 
     //暫停選單
     private PauseMenu pauseMenu;
@@ -48,9 +51,9 @@ public class Main implements ApplicationListener {
 
         // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
-        rainDrops.setProjectileCount(5);  //設定投射物數量，後續放進升級系統
-        rainDrops.setProjectileSpeed(10.0f);  //設定投射物速度，後續放進升級系統
-        rainDrops.setSpawnInterval(0.1f);  //設定投射物發射間隔，後續放進升級系統
+        rainDrops.setProjectileCount(1);  //設定投射物數量，後續放進升級系統
+        rainDrops.setProjectileSpeed(4.0f);  //設定投射物速度，後續放進升級系統
+        rainDrops.setSpawnInterval(0.5f);  //設定投射物發射間隔，後續放進升級系統
         rainDrops.setProjectileSize(1.0f);  //設定投射物發射間隔，後續放進升級系統
 
         //初始化怪物
@@ -60,6 +63,11 @@ public class Main implements ApplicationListener {
         // 其他物件
         touchPos = new Vector2();
         characterRectangle = new Rectangle();
+
+        // 5/31新增飛彈系列  讓 BossA 知道 MissileManager
+        missileManager = new MissileManager(); // <--- 初始化 MissileManager
+        missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
+        boss1.setMissileManager(missileManager);
 
         //設置音樂
         music.setLooping(true);
@@ -143,7 +151,7 @@ public class Main implements ApplicationListener {
         // 更新投射物
         rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character);
         //更新怪物
-        boss1.update(Gdx.graphics.getDeltaTime());
+//        boss1.update(Gdx.graphics.getDeltaTime());
     }
 
     private void draw() {
@@ -155,6 +163,8 @@ public class Main implements ApplicationListener {
         // 更新攝影機
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
+        // 取得自上一幀以來經過的時間，飛彈用
+        float deltaTime = Gdx.graphics.getDeltaTime(); // <--- 在這裡取得時間差！
         spriteBatch.begin();
 
         float worldWidth = viewport.getWorldWidth();
@@ -169,6 +179,18 @@ public class Main implements ApplicationListener {
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());// 或其他範圍大小
         //更新子彈
         rainDrops.render(spriteBatch);
+        // 只有當 Boss 存活時才更新和繪製 Boss 的行為
+        if (boss1.isAlive()) { // <--- 新增判斷
+            boss1.render(spriteBatch); // 繪製 Boss
+            boss1.getMonsterAI().update(deltaTime); // 更新怪物 AI
+        } else {
+            // TODO: Boss 死亡後的遊戲邏輯，例如顯示遊戲勝利畫面
+            System.out.println("遊戲勝利！");
+        }
+
+        //飛彈
+        missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
+        missileManager.render(spriteBatch);    // <--- 由 MissileManager 渲染所有飛彈
 
         spriteBatch.end();
     }
@@ -190,5 +212,7 @@ public class Main implements ApplicationListener {
         rainDrops.dispose();
         boss1.dispose();
         pauseMenu.dispose();
+        //5/31飛彈
+        missileManager.dispose(); // <--- 釋放 MissileManager 的資源
     }
 }
