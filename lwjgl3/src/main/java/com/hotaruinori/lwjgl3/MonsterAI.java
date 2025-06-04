@@ -18,15 +18,15 @@ public class MonsterAI {
     private float attackRange; // 怪物可以攻擊的距離範圍
     private float LASER_Range=1f; //可以放雷射的範圍
     private float MISSILE_Range=10f; //可以放飛彈的範圍
-    private float Charge_Range=2f; //可以衝撞的範圍
+    private float Charge_Range=3f; //可以衝撞的範圍
     //之後會新增
     private float MISSILE_BIG_Range=600f;
 
     // 為不同攻擊模式設定獨立的冷卻時間
     private float genericAttackCooldownDuration = 1f; // 所有攻擊後共用的短暫冷卻時間
     private float laserCooldown = 30.0f; // 雷射攻擊冷卻時間 (範例值)
-    private float missileCooldown = 3.0f; // 飛彈攻擊冷卻時間 (範例值)
-    private float chargeCooldown = 10.0f; // 衝撞攻擊冷卻時間 (範例值)
+    private float missileCooldown = 5.0f; // 飛彈攻擊冷卻時間 (範例值)
+    private float chargeCooldown = 5.0f; // 衝撞攻擊冷卻時間 (範例值)
 
 
     private float attackDamage; // 怪物造成的傷害值
@@ -38,17 +38,17 @@ public class MonsterAI {
     // 雷射和衝撞可能需要額外的準備時間或持續時間
     private float laserPreparationTime = 1.0f; // 雷射準備時間
     private float laserDuration = 0.5f;       // 雷射持續時間
-    private float chargePreparationTime = 0.5f; // 衝撞準備時間
-    private float chargeDuration = 1.0f;      // 衝撞移動持續時間 (或衝撞距離)
+    private float chargePreparationTime = 1f; // 衝撞準備時間
+    private float chargeDuration = 2f;      // 衝撞移動持續時間 (或衝撞距離)
     private Vector2 chargeTargetPosition;     // 衝撞的目標位置
     //傷害係數
     private float laserDamageCoefficient = 2f;
     private float chargeDamageCoefficient = 3f;
     private float missileDamageCoefficient = 1.5f;
     //飛彈細項
-    private int numberOfMissiles = 3; // 發射 3 枚飛彈
+    private int numberOfMissiles = 1; // 發射 3 枚飛彈
     private float spreadAngle = 45f;  // 總扇形角度為 45 度 (從最左到最右)
-    private float missileSpeed = 3.5f;
+    private float missileSpeed = 3.0f;
     // 追蹤和攻擊參數
     private float moveSpeed;
     private float attackDistanceThreshold; // 當距離小於此值時停止追蹤，避免抖動
@@ -201,8 +201,7 @@ public class MonsterAI {
             case ATTACKING_CHARGE:
                 performChargeAttack(deltaTime);
                 Vector2 currentMonsterPos = monster.getCenterPosition();
-                if (currentMonsterPos.dst(chargeTargetPosition) < 20 ||
-                    (timeSinceLastChargeAttack - chargePreparationTime) >= chargeDuration) {
+                if ((timeSinceLastChargeAttack - chargePreparationTime) >= chargeDuration) {
                     performChargeImpactDamage();
                     currentState = BossState.COOLDOWN;
                     timeInCooldownState = 0; // <--- 重置冷卻計時器
@@ -305,8 +304,8 @@ public class MonsterAI {
             // 計算衝撞方向
             Vector2 direction = new Vector2(chargeTargetPosition).sub(monsterCenter).nor();
             // 移動怪物
-            monster.setX(monster.getX() + direction.x * moveSpeed * 2 * deltaTime); // 衝撞速度可以更快
-            monster.setY(monster.getY() + direction.y * moveSpeed * 2 * deltaTime);
+            monster.setX(monster.getX() + direction.x * moveSpeed * 3 * deltaTime); // 衝撞速度可以更快
+            monster.setY(monster.getY() + direction.y * moveSpeed * 3 * deltaTime);
             // TODO: 在衝撞路徑上檢測碰撞並造成傷害
             // 這個複雜度較高，可以簡單處理為：到達目標點後造成傷害
         }
@@ -320,7 +319,7 @@ public class MonsterAI {
 
             // 在衝撞結束時，檢查玩家是否在終點附近，如果是，造成傷害
             Vector2 monsterCenter = monster.getCenterPosition();
-            float impactRange = attackRange * 1.5f; // 衝撞的衝擊範圍
+            float impactRange =  3f; // 衝撞的衝擊範圍
             if (monsterCenter.dst(character.getCenterPosition()) < impactRange) {
                 monster.playChargeImpactEffect();  // 播放衝撞擊中效果
                 System.out.println("Boss 衝撞擊中玩家，造成 " + attackDamage * 3 + " 點傷害！");

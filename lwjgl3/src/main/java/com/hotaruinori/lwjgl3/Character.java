@@ -13,6 +13,7 @@ public class Character {
     // 可調整參數
     float MAX_HEALTH = 100.0f;      //最大血量
     float CURRENT_HEALTH = 100.0f;  //當前血量
+    float AUTO_HEAL_POINT = 1.0f;     // 秒回
     float MOVE_SPEED = 4.0f;        //移動速度
     float CHARACTER_HEIGHT = 0.5f;        //角色寬度
     float CHARACTER_WIDTH = 0.5f;        //角色高度
@@ -30,9 +31,11 @@ public class Character {
     private State state = State.STANDING;
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
-    // 血量初始
+    // 血量相關初始
     private float maxHealth = MAX_HEALTH;   // 最大血量
     private float currentHealth = CURRENT_HEALTH;  // 當前血量
+    private float autoHealPoint = AUTO_HEAL_POINT; // 每秒回血量
+    private float healTimer = 0f;
     // 單像素白色貼圖用於繪製血條
     private static Texture whiteTexture;
 
@@ -183,6 +186,8 @@ public class Character {
             stateTime = 0;
             sprite.setRegion(standingFrames[facing.ordinal()]);
         }
+        //每秒回血
+        updateHealing(delta);
     }
 
     private TextureRegion getCurrentAnimationFrame() {
@@ -243,6 +248,14 @@ public class Character {
     public void takeDamage(float damage) {
         currentHealth -= damage;
         if (currentHealth < 0) currentHealth = 0;
+    }
+    // 回血處理邏輯
+    private void updateHealing(float delta) {
+        healTimer += delta;
+        if (healTimer >= 1.0f) {
+            healTimer -= 1.0f;
+            heal(autoHealPoint); // 每秒呼叫一次 heal()
+        }
     }
 
     public void heal(float amount) {

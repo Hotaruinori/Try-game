@@ -13,7 +13,7 @@ public class Missile {
     private float speed;
     private float damage;
     private boolean active;
-    private float lifeTime = 10.0f;  //飛彈存活時間
+    private float lifeTime = 4.0f;  //飛彈存活時間
     private float timeElapsed = 0f;
     private float MissileWidth = 0.4f;  //飛彈圖片大小
     private float MissileHeight = 0.4f; //飛彈圖片大小
