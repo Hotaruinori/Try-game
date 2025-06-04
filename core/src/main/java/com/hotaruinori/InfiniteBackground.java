@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
+import com.badlogic.gdx.utils.Array;
 
 import java.util.*;
 
@@ -20,22 +21,29 @@ public class InfiniteBackground {
     // 定義可用的物件類型（含圖片與是否阻擋）
     private static class BackgroundObjectType {
         public final String name;
-        Texture texture;
+        Array<Texture> textures;
         boolean isBlocking;
         boolean allowRandomSize;  // ➕ 是否允許隨機大小
         boolean allowRotation;    // ➕ 是否允許旋轉
         float density;       // ➕ 每個單位面積的物件密度（例如 0.2 表示每 1 單位面積期望 0.2 個）
         float probability;   // ➕ 每次嘗試時的物件生成機率（例如 0.6 表示 60% 機率會放）
 
-        BackgroundObjectType(String name, String texturePath, boolean isBlocking,
+        BackgroundObjectType(String name, String[] texturePaths, boolean isBlocking,
                              boolean allowRandomSize, boolean allowRotation, float density, float probability) {
             this.name = name;
-            this.texture = new Texture(texturePath);
+            this.textures = new Array<>();
+            for (String path : texturePaths) {
+                this.textures.add(new Texture(path));
+            }
             this.isBlocking = isBlocking;
             this.allowRandomSize = allowRandomSize;
             this.allowRotation = allowRotation;
             this.density = density;
             this.probability = probability;
+        }
+        // 隨機取得一張圖片
+        public Texture getRandomTexture() {
+            return textures.random();
         }
     }
 
@@ -45,12 +53,13 @@ public class InfiniteBackground {
         texture = new Texture(tileTexturePath); // 載入地磚圖片
 
         // ➕ 將各種背景物件加入objectTypes，可指定圖片、是否阻擋人物，是否隨機大小，是否旋轉、物件密度、生成機率
-        objectTypes.add(new BackgroundObjectType("house","box.png", true, true, true,0.1f, 0.7f));       // 樹，阻擋
-        objectTypes.add(new BackgroundObjectType("fence","rock_hat.png", true,false, false,0.5f, 0.7f));  // 石頭，阻擋
-        objectTypes.add(new BackgroundObjectType("box","box.png", true, true, true,0.1f, 0.7f));       // 樹，阻擋
-        objectTypes.add(new BackgroundObjectType("rock_hat","rock_hat.png", true,false, false,0.5f, 0.7f));  // 石頭，阻擋
-        objectTypes.add(new BackgroundObjectType("bucket","bucket.png", false, true, true,0.05f, 0.5f));   // 草叢，不阻擋
-        objectTypes.add(new BackgroundObjectType("bucket2","bucket.png", false, true, true,0.05f, 0.5f));   // 招牌，不阻擋
+        // new String[]{"box.png", "house2.png"} 第二個參數用這樣去放，目的是可以使用多圖片做隨機功能
+        objectTypes.add(new BackgroundObjectType("house",new String[]{"box.png","Piercing_Ring.png","Air_Cannon.png","Small_Light.png","Big_Light.png","Time_Scarf.png"}, true, true, true,0.1f, 0.7f));       // 樹，阻擋
+        objectTypes.add(new BackgroundObjectType("fence",new String[]{"rock_hat.png"}, true,false, false,0.5f, 0.7f));  // 石頭，阻擋
+        objectTypes.add(new BackgroundObjectType("box",new String[]{"Dog1.png","Dog2.png"}, true, true, true,0.1f, 0.7f));       // 樹，阻擋
+        objectTypes.add(new BackgroundObjectType("rock_hat",new String[]{"Emotional_Band.png"}, true,false, false,0.5f, 0.7f));  // 石頭，阻擋
+        objectTypes.add(new BackgroundObjectType("bucket",new String[]{"Welcome_Cat.png"}, false, true, true,0.05f, 0.5f));   // 草叢，不阻擋
+        objectTypes.add(new BackgroundObjectType("bucket2",new String[]{"Mini_Dora.png"}, false, true, true,0.05f, 0.5f));   // 招牌，不阻擋
     }
 
     // ✅（新增）用來標記每個區塊的座標 key(ChunkKey)，給後面的generateChunksAround方法使用。
@@ -156,7 +165,7 @@ public class InfiniteBackground {
                 float x = chunkOriginX + MathUtils.random(0f, CHUNK_SIZE);
                 float y = chunkOriginY + MathUtils.random(0f, CHUNK_SIZE);
                 // 產生物件
-                Sprite obj = new Sprite(type.texture);
+                Sprite obj = new Sprite(type.getRandomTexture());
 
                 // 依照是否允許隨機大小設定尺寸，並設定預設值
                 float width = type.allowRandomSize ? MathUtils.random(0.4f, 0.8f) : 0.6f;
@@ -251,7 +260,7 @@ public class InfiniteBackground {
                 float houseY = offset[1]; // 建築物左下角 Y 座標
 
                 // 用找到的房子類型的圖片建立一個新的 Sprite 物件
-                Sprite house = new Sprite(houseType.texture);
+                Sprite house = new Sprite(houseType.getRandomTexture());
                 // 設定房子的顯示尺寸（寬、高）
                 house.setSize(houseWidth, houseHeight);
                 // 將旋轉與縮放的中心點設為房子的正中央
@@ -281,7 +290,7 @@ public class InfiniteBackground {
                     // 增強型 for 迴圈（Enhanced for loop），搭配一個匿名陣列（anonymous array）
                     for (float y : new float[]{fy, fy + fh - fenceThickness}) {
                         // 用圍欄圖片建立一個新的 Sprite
-                        Sprite fence = new Sprite(fenceType.texture);
+                        Sprite fence = new Sprite(fenceType.getRandomTexture());
                         fence.setSize(0.4f, 0.3f);
                         fence.setOriginCenter();
                         fence.setPosition(x, y);
@@ -297,7 +306,7 @@ public class InfiniteBackground {
                 for (int i = 0; i < Math.ceil(fh / 0.5f); i++) {
                     float y = fy + i * 0.5f;
                     for (float x : new float[]{fx, fx + fw - fenceThickness}) {
-                        Sprite fence = new Sprite(fenceType.texture);
+                        Sprite fence = new Sprite(fenceType.getRandomTexture());
                         fence.setSize(0.3f, 0.4f);
                         fence.setOriginCenter();
                         fence.setPosition(x, y);
@@ -354,7 +363,7 @@ public class InfiniteBackground {
     public void dispose() {
         texture.dispose();
         for (BackgroundObjectType type : objectTypes) {
-            type.texture.dispose();
+            type.getRandomTexture().dispose();
         }
     }
 }
