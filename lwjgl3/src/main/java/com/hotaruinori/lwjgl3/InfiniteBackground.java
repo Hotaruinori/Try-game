@@ -166,13 +166,15 @@ public class InfiniteBackground {
                 Rectangle newObjRect = new Rectangle(x - width / 2, y - height / 2, width, height);
                 // **檢查新物件是否和已存在的阻擋區域（尤其是房子與圍欄）重疊，若重疊則跳過本次生成**
                 boolean overlaps = false;
+                // 新增：避免生成在起始點附近（假設起始點在 0,0）
+                float distance = Vector2.dst(newObjRect.x, newObjRect.y, 0, 0);
                 for (Rectangle blockRect : data.blockingBounds) { //對 data.blockingBounds 裡的每個 Rectangle（矩形）都執行一次
                     if (blockRect.overlaps(newObjRect)) {
                         overlaps = true;
                         break;
                     }
                 }
-                if (overlaps) {
+                if (overlaps || distance < 2f) {
                     // 跳過這次生成，避免物件生成於房子或圍欄區域
                     continue;
                 }
