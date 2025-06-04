@@ -32,12 +32,14 @@ public class Main implements ApplicationListener {
 
     //暫停選單
     private PauseMenu pauseMenu;
+    //怪物生成器
+    private Monster_Generator monsterGenerator;
 
 
     @Override
     public void create() {
         //初始化基礎資源
-        infiniteBackground = new InfiniteBackground("background.png");
+        infiniteBackground = new InfiniteBackground("background2.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
 
@@ -69,6 +71,8 @@ public class Main implements ApplicationListener {
         missileManager = new MissileManager(); // <--- 初始化 MissileManager
         missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
         boss1.setMissileManager(missileManager);
+        // ✅ 初始化怪物生成器（每 5 秒生成一次怪物）
+        monsterGenerator = new Monster_Generator(character, viewport.getCamera(), 5f, missileManager);
 
         //設置音樂
         music.setLooping(true);
@@ -114,10 +118,10 @@ public class Main implements ApplicationListener {
         Vector2 direction = new Vector2(0, 0);
 
         // 處理鍵盤輸入（現在可以同時檢測多個按鍵）
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT)) direction.x += 1;
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT)) direction.x -= 1;
-        if (Gdx.input.isKeyPressed(Input.Keys.UP)) direction.y += 1;
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN)) direction.y -= 1;
+        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {direction.x += 1;}
+        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {direction.x -= 1;}
+        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {direction.y += 1;}
+        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {direction.y -= 1;}
 
         if (!direction.isZero()) {
             character.moveWithDirection(delta, direction, speed);
@@ -139,25 +143,18 @@ public class Main implements ApplicationListener {
     private void logic() {
         float worldWidth = viewport.getWorldWidth();
         float worldHeight = viewport.getWorldHeight();
-
-
-        // 更新角色碰撞框
-        characterRectangle.set(
-            character.getX(),
-            character.getY(),
-            character.getWidth(),
-            character.getHeight()
-        );
-
-        // 更新投射物
-        rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character, boss1);
-        // 取得自上一幀以來經過的時間，飛彈用
+        // 取得自上一幀以來經過的時間，飛彈、怪物生成用
         float deltaTime = Gdx.graphics.getDeltaTime(); // <--- 在這裡取得時間差！
+        // 更新投射物
+        rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character, boss1, monsterGenerator);
+
         if (boss1.isAlive()) { // <--- 新增判斷
             boss1.getMonsterAI().update(deltaTime); // 更新怪物 AI
         }
         //飛彈
         missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
+        // ✅ 更新怪物生成器
+        monsterGenerator.update(deltaTime);
         // 經驗球
         ExpBall.update(deltaTime, character);
     }
@@ -197,6 +194,7 @@ public class Main implements ApplicationListener {
 
         //飛彈
         missileManager.render(spriteBatch);    // <--- 由 MissileManager 渲染所有飛彈
+        monsterGenerator.render(spriteBatch);
         // 經驗球
         ExpBall.render(spriteBatch);
 

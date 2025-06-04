@@ -51,7 +51,7 @@ public class Projectiles {
         this.projectileCount = PROJECTILE_COUNT;
     }
 
-    public void update(float delta, Rectangle characterRect, Viewport viewport, Character character, BossA boss1) {
+    public void update(float delta, Rectangle characterRect, Viewport viewport, Character character, BossA boss1, Monster_Generator monsterGenerator) {
         // 更新每一個投射物的位置與判斷是否離開畫面
         for (int i = projectiles.size - 1; i >= 0; i--) {
             ProjectileInstance instance = projectiles.get(i);
@@ -66,9 +66,21 @@ public class Projectiles {
             projectileRectangle.set(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
             // 檢查是否打中任何怪物
             boolean hit = false;
+            // 1. 判斷是否打到 Boss
             if (projectileRectangle.overlaps(boss1.BossA_Rectangle())) {
                 boss1.takeDamage(projectiledamage); // 造成傷害
                 hit = true;
+            }
+            // 2. 判斷是否打到怪物陣列中的任一隻
+            Array<BossA> monsters = monsterGenerator.getMonsters();
+            if (!hit) {
+                for (BossA boss : monsters) {
+                    if (boss != null && boss.isAlive() && projectileRectangle.overlaps(boss.BossA_Rectangle())) {
+                        boss.takeDamage(projectiledamage);
+                        hit = true;
+                        break; // 只打中一隻怪物就停止
+                    }
+                }
             }
             // 若投射物擊中或超出視野範圍，則移除
             if (hit||isOutOfView(projectile, viewport)) {

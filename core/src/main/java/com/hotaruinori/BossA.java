@@ -42,7 +42,7 @@ public class BossA {
     public BossA() {
         bossSprite = new Sprite(new Texture(Boss_image));
 
-        this.maxHealth = 1000f; // 設定 Boss 的最大生命值
+        this.maxHealth = 100f; // 設定 Boss 的最大生命值
         this.currentHealth = maxHealth; // 初始生命值等於最大生命值
         this.isAlive = true; // 初始為存活狀態
 
