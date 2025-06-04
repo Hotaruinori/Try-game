@@ -5,6 +5,7 @@ import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
+import com.badlogic.gdx.math.Circle;
 import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.graphics.Pixmap; // 繪製血條用
@@ -31,6 +32,7 @@ public class Character {
     private State state = State.STANDING;
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
+    private int exp = 0; //初始經驗值
     // 血量相關初始
     private float maxHealth = MAX_HEALTH;   // 最大血量
     private float currentHealth = CURRENT_HEALTH;  // 當前血量
@@ -243,6 +245,15 @@ public class Character {
 
     public float getHeight() {
         return sprite.getHeight();
+    }
+    //圓形碰撞區域，目前是給經驗值球用
+    public Circle getBounds() {
+        return new Circle(getX(), getY(), 1f); // 根據需要調整
+    }
+    //經驗值計算
+    public void addExp(int value) {
+        this.exp += value;
+        System.out.println("Gained " + value + " EXP. Total: " + this.exp);
     }
 
     public void takeDamage(float damage) {

@@ -151,8 +151,15 @@ public class Main implements ApplicationListener {
 
         // 更新投射物
         rainDrops.update(Gdx.graphics.getDeltaTime(), characterRectangle, viewport, character, boss1);
-        //更新怪物
-//        boss1.update(Gdx.graphics.getDeltaTime());
+        // 取得自上一幀以來經過的時間，飛彈用
+        float deltaTime = Gdx.graphics.getDeltaTime(); // <--- 在這裡取得時間差！
+        if (boss1.isAlive()) { // <--- 新增判斷
+            boss1.getMonsterAI().update(deltaTime); // 更新怪物 AI
+        }
+        //飛彈
+        missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
+        // 經驗球
+        ExpBall.update(deltaTime, character);
     }
 
     private void draw() {
@@ -164,8 +171,7 @@ public class Main implements ApplicationListener {
         // 更新攝影機
         viewport.apply();
         spriteBatch.setProjectionMatrix(viewport.getCamera().combined);
-        // 取得自上一幀以來經過的時間，飛彈用
-        float deltaTime = Gdx.graphics.getDeltaTime(); // <--- 在這裡取得時間差！
+
         spriteBatch.begin();
 
         float worldWidth = viewport.getWorldWidth();
@@ -183,15 +189,16 @@ public class Main implements ApplicationListener {
         // 只有當 Boss 存活時才更新和繪製 Boss 的行為
         if (boss1.isAlive()) { // <--- 新增判斷
             boss1.render(spriteBatch); // 繪製 Boss
-            boss1.getMonsterAI().update(deltaTime); // 更新怪物 AI
-        } else {
+        }
+        else {
             // TODO: Boss 死亡後的遊戲邏輯，例如顯示遊戲勝利畫面
-            System.out.println("遊戲勝利！");
+//            System.out.println("遊戲勝利！");
         }
 
         //飛彈
-        missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
         missileManager.render(spriteBatch);    // <--- 由 MissileManager 渲染所有飛彈
+        // 經驗球
+        ExpBall.render(spriteBatch);
 
         spriteBatch.end();
     }
