@@ -1,10 +1,10 @@
-package com.hotaruinori.lwjgl3.Attack;
+package com.hotaruinori.Attack;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
-import com.hotaruinori.lwjgl3.Character;
+import com.hotaruinori.Character;
 
 public class Missile {
     private Sprite missileSprite;

@@ -1,7 +1,7 @@
-package com.hotaruinori.lwjgl3;
+package com.hotaruinori;
 
-import com.hotaruinori.lwjgl3.Attack.Missile;
-import com.hotaruinori.lwjgl3.Attack.MissileManager; // <--- 新增引入
+import com.hotaruinori.Attack.Missile;
+import com.hotaruinori.Attack.MissileManager; // <--- 新增引入
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
@@ -42,7 +42,7 @@ public class BossA {
     public BossA() {
         bossSprite = new Sprite(new Texture(Boss_image));
 
-        this.maxHealth = 10f; // 設定 Boss 的最大生命值
+        this.maxHealth = 1000f; // 設定 Boss 的最大生命值
         this.currentHealth = maxHealth; // 初始生命值等於最大生命值
         this.isAlive = true; // 初始為存活狀態
 

@@ -1,4 +1,4 @@
-package com.hotaruinori.lwjgl3;
+package com.hotaruinori;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;

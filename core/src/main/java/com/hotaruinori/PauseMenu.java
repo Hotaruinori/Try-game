@@ -1,4 +1,4 @@
-package com.hotaruinori.lwjgl3;
+package com.hotaruinori;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
