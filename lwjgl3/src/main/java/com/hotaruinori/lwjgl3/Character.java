@@ -140,26 +140,34 @@ public class Character {
         // 加載站立幀紋理
         standingFrames = new TextureRegion[4];
         standingFrames[FacingDirection.UP.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk_back1.png"));
-        standingFrames[FacingDirection.DOWN.ordinal()] = new TextureRegion(new Texture("character_img/dora_standing.png"));
-        standingFrames[FacingDirection.LEFT.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk_left_1.png"));
-        standingFrames[FacingDirection.RIGHT.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk_right_1.png"));
+        standingFrames[FacingDirection.DOWN.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk1.png"));
+        standingFrames[FacingDirection.LEFT.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk_left1.png"));
+        standingFrames[FacingDirection.RIGHT.ordinal()] = new TextureRegion(new Texture("character_img/dora_walk_right1.png"));
 
         // 初始化走路動畫
         walkUpAnimation = new Animation<>(0.15f,
             new TextureRegion(new Texture("character_img/dora_walk_back1.png")),
-            new TextureRegion(new Texture("character_img/dora_walk_back2.png"))
+            new TextureRegion(new Texture("character_img/dora_walk_back2.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_back3.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_back4.png"))
         );
         walkDownAnimation = new Animation<>(0.15f,
-            new TextureRegion(new Texture("character_img/dora_standing.png")),
-            new TextureRegion(new Texture("character_img/dora_standing.png"))
+            new TextureRegion(new Texture("character_img/dora_walk1.png")),
+            new TextureRegion(new Texture("character_img/dora_walk2.png")),
+            new TextureRegion(new Texture("character_img/dora_walk3.png")),
+            new TextureRegion(new Texture("character_img/dora_walk4.png"))
         );
         walkLeftAnimation = new Animation<>(0.15f,
-            new TextureRegion(new Texture("character_img/dora_walk_left_1.png")),
-            new TextureRegion(new Texture("character_img/dora_walk_left_2.png"))
+            new TextureRegion(new Texture("character_img/dora_walk_left1.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_left2.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_left3.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_left4.png"))
         );
         walkRightAnimation = new Animation<>(0.15f,
-            new TextureRegion(new Texture("character_img/dora_walk_right_1.png")),
-            new TextureRegion(new Texture("character_img/dora_walk_right_2.png"))
+            new TextureRegion(new Texture("character_img/dora_walk_right1.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_right2.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_right3.png")),
+            new TextureRegion(new Texture("character_img/dora_walk_right4.png"))
         );
     }
 
