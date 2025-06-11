@@ -299,7 +299,7 @@ public class MonsterAI {
         } else {
 
             // 衝撞移動階段：怪物朝目標位置快速移動
-            System.out.println("Boss 正在衝撞！");
+//            System.out.println("Boss 正在衝撞！");
             Vector2 monsterCenter = monster.getCenterPosition();
             // 計算衝撞方向
             Vector2 direction = new Vector2(chargeTargetPosition).sub(monsterCenter).nor();

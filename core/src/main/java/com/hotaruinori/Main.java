@@ -16,7 +16,7 @@ public class Main implements ApplicationListener {
     // 遊戲資源
     private Music music;
     private InfiniteBackground infiniteBackground;
-
+    private HUD hud;  //新增UI
     //渲染相關
     private SpriteBatch spriteBatch;
     private FitViewport viewport;
@@ -42,7 +42,7 @@ public class Main implements ApplicationListener {
         infiniteBackground = new InfiniteBackground("background2.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
-
+        hud = new HUD();  //HUD介面
         //初始化渲染系統
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(8, 5);
@@ -72,7 +72,7 @@ public class Main implements ApplicationListener {
         missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
         boss1.setMissileManager(missileManager);
         // ✅ 初始化怪物生成器（每 5 秒生成一次怪物）
-        monsterGenerator = new Monster_Generator(character, viewport.getCamera(), 5f, missileManager);
+        monsterGenerator = new Monster_Generator(character, viewport.getCamera(), 5.0f, missileManager);
 
         //設置音樂
         music.setLooping(true);
@@ -85,6 +85,7 @@ public class Main implements ApplicationListener {
     @Override
     public void resize(int width, int height) {
         viewport.update(width, height, true);
+        hud.resize(width, height);      // HUD 畫面
     }
 
     @Override
@@ -157,6 +158,7 @@ public class Main implements ApplicationListener {
         monsterGenerator.update(deltaTime);
         // 經驗球
         ExpBall.update(deltaTime, character);
+        hud.setExp(character.getCurrentExp(), character.getNextLevelExp(), character.getCurrentLevel());
     }
 
     private void draw() {
@@ -197,8 +199,10 @@ public class Main implements ApplicationListener {
         monsterGenerator.render(spriteBatch);
         // 經驗球
         ExpBall.render(spriteBatch);
-
         spriteBatch.end();
+        // 額外使用 ShapeRenderer 畫經驗值條
+        //LibGDX 要求你不能在 SpriteBatch.begin() 和 ShapeRenderer.begin() 同時使用，否則會觸發錯誤。
+        hud.render(spriteBatch); // <-- 注意一定要在 batch.end() 後呼叫
     }
 
     @Override
@@ -220,5 +224,6 @@ public class Main implements ApplicationListener {
         pauseMenu.dispose();
         //5/31飛彈
         missileManager.dispose(); // <--- 釋放 MissileManager 的資源
+        hud.dispose();
     }
 }

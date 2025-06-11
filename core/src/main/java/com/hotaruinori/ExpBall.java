@@ -68,11 +68,11 @@ public class ExpBall {
 
         // 10%機率生成大球，大球給20經驗，大小0.25世界單位
         if (roll < 0.1f) {
-            activeBalls.add(new ExpBall(x, y, 20, largeExpRegion, 0.25f));
+            activeBalls.add(new ExpBall(x, y, 50, largeExpRegion, 0.25f));
         }
         // 70%機率生成小球，小球給5經驗，大小0.2世界單位
         else if (roll < 0.8f) {
-            activeBalls.add(new ExpBall(x, y, 5, smallExpRegion, 0.2f));
+            activeBalls.add(new ExpBall(x, y, 20, smallExpRegion, 0.2f));
         }
         // 其他情況不生成球
     }
