@@ -194,7 +194,7 @@ public class Projectiles {
         projectileTexture.dispose();
         hitSound.dispose();
     }
-
+    // 讓其他類別（例如 main.java 或 Monster_Generator）能夠取得目前畫面上所有的投射物實體陣列
     public Array<ProjectileInstance> getProjectiles() {
         return projectiles;
     }

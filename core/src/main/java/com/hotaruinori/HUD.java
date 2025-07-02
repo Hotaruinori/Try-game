@@ -12,7 +12,7 @@ import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
 
 /**
- * HUD 類別：負責顯示畫面上方的資訊（例如經驗條與武器圖示）
+ * HUD Class：負責顯示畫面上方的資訊（例如經驗條與武器圖示）
  */
 public class HUD {
 
