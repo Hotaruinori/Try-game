@@ -32,6 +32,8 @@ public class Main implements ApplicationListener {
 
     //暫停選單
     private PauseMenu pauseMenu;
+    //結束選單
+    private GameOverMenu gameOverMenu;
     //怪物生成器
     private Monster_Generator monsterGenerator;
 
@@ -78,8 +80,9 @@ public class Main implements ApplicationListener {
         music.setLooping(true);
         music.setVolume(.5f);
         music.play();
-        //暫停選單
+        //暫停選單與結束選單
         pauseMenu = new PauseMenu();
+        gameOverMenu = new GameOverMenu();
     }
 
     @Override
@@ -90,26 +93,43 @@ public class Main implements ApplicationListener {
 
     @Override
     public void render() {
-        // 處理 ESC 鍵：按一下切換暫停/恢復
+        // 優先處理 Game Over 狀態
+        if (gameOverMenu.isVisible()) {
+            gameOverMenu.render();  // 顯示 Game Over 畫面
+            return;                 // 停止 input() 和 logic()，遊戲停止
+        }
+
+        // ESC 鍵控制暫停與恢復
         if (Gdx.input.isKeyJustPressed(Input.Keys.ESCAPE)) {
             if (pauseMenu.isVisible()) {
                 pauseMenu.hide();
             } else {
                 pauseMenu.show(() -> {
-                    pauseMenu.hide(); // Resume 遊戲
+                    pauseMenu.hide(); // Resume
                 }, () -> {
-                    Gdx.app.exit(); // Exit 遊戲
+                    Gdx.app.exit(); // Exit
                 });
             }
         }
 
+        // 遊戲邏輯只在未暫停與未死亡狀態時進行
         if (!pauseMenu.isVisible()) {
             input();
             logic();
+
+            // 加上角色死亡檢查：在 logic() 裡也可以
+            if (character.getCurrentHealth() <= 0) {
+                gameOverMenu.show(character.getCurrentExp(), () -> {
+                    //restartGame(); // TODO: 尚未實作重啟遊戲功能
+                }, () -> {
+                    Gdx.app.exit(); // 離開
+                });
+                return;
+            }
         }
 
-        draw(); // draw 你自己遊戲畫面
-        pauseMenu.render(); // 最後畫上 pauseMenu
+        draw(); // 渲染遊戲畫面
+        pauseMenu.render(); // 繪製暫停選單（如果開啟）
     }
 
     private void input() {

@@ -9,6 +9,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+// 目前還沒開始使用本class檔案，優先處理開始與結束功能
 
 /**
  * Weapon 抽象類別：所有武器的基礎類別，提供共通欄位與方法。
@@ -55,12 +56,81 @@ public abstract class Weapon_Base {
         }
     }
 
-    // 每幀更新邏輯（必須實作）
-    public abstract void update(float delta, Rectangle characterRect, Viewport viewport, Character character, BossA boss1, Monster_Generator monsterGenerator);
+    // 檢查投射物是否超出攝影機視野邊界，方便後續的Update使用
+    protected boolean isOutOfView(Sprite sprite, Viewport viewport) {
+        float camX = viewport.getCamera().position.x;
+        float camY = viewport.getCamera().position.y;
+        float camWidth = viewport.getWorldWidth();
+        float camHeight = viewport.getWorldHeight();
 
-    // 渲染圖像
-    public void render(SpriteBatch batch) {}
+        float left = camX - camWidth / 2;
+        float right = camX + camWidth / 2;
+        float bottom = camY - camHeight / 2;
+        float top = camY + camHeight / 2;
 
+        return (sprite.getX() + sprite.getWidth() < left ||
+            sprite.getX() > right ||
+            sprite.getY() + sprite.getHeight() < bottom ||
+            sprite.getY() > top);
+    }
+
+    /**
+     * 檢查是否擊中 Boss 或怪物並套用傷害
+     *
+     * @param projectileRect 投射物的碰撞矩形
+     * @param boss1          Boss 實體
+     * @param monsters       怪物陣列
+     * @return 如果有命中任一對象則回傳 true，否則 false
+     */
+    protected boolean checkCollisionAndApplyDamage(Rectangle projectileRect, BossA boss1, Array<BossA> monsters) {
+        // 判斷是否打中 Boss
+        if (projectileRect.overlaps(boss1.BossA_Rectangle())) {
+            boss1.takeDamage(projectileDamage);
+            return true;
+        }
+
+        // 判斷是否打中怪物陣列中的任一隻
+        for (BossA boss : monsters) {
+            if (boss != null && boss.isAlive() && projectileRect.overlaps(boss.BossA_Rectangle())) {
+                boss.takeDamage(projectileDamage);
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+
+    // 每幀更新邏輯（必須實作在子Class中，這邊是先拆開來）
+    public void update(float delta, Rectangle characterRect, Viewport viewport, Character character, BossA boss1, Monster_Generator monsterGenerator) {
+        // 更新每一個投射物的位置與判斷是否離開畫面
+        for (int i = projectiles.size - 1; i >= 0; i--) {
+            ProjectileInstance instance = projectiles.get(i);
+            Sprite projectile = instance.sprite;
+            Vector2 velocity = instance.velocity;
+
+            // 移動投射物（依速度與每幀時間）
+            projectile.translate(velocity.x * delta, velocity.y * delta);
+
+            // 更新暫存矩形用於碰撞判定
+            projectileRectangle.set(projectile.getX(), projectile.getY(), projectile.getWidth(), projectile.getHeight());
+
+            // 判斷是否打中 Boss 或怪物
+            boolean hit = checkCollisionAndApplyDamage(projectileRectangle, boss1, monsterGenerator.getMonsters());
+
+            // 如果擊中或離開螢幕視野，就移除投射物
+            if (hit || isOutOfView(projectile, viewport)) {
+                projectiles.removeIndex(i);
+            }
+        }
+    }
+    // 渲染圖像 （必須實作在子Class中，這邊是先拆開來）
+    public void render(SpriteBatch batch) {
+        // 渲染所有投射物
+        for (ProjectileInstance instance : projectiles) {
+            instance.sprite.draw(batch);
+        }
+    }
 
 
 

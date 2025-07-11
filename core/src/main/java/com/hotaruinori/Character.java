@@ -262,6 +262,10 @@ public class Character {
         return exp;
     }
 
+    public float getCurrentHealth() {
+        return currentHealth;
+    }
+
     public int getNextLevelExp() {
         return expToNextLevel;
     }
@@ -303,6 +307,11 @@ public class Character {
     public void heal(float amount) {
         currentHealth += amount;
         if (currentHealth > maxHealth) currentHealth = maxHealth;
+    }
+
+    //加入死亡判斷
+    public boolean isDead() {
+        return currentHealth <= 0;
     }
 
     public void render(SpriteBatch batch) {
