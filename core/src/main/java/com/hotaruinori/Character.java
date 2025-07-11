@@ -32,7 +32,8 @@ public class Character {
     private State state = State.STANDING;
     private FacingDirection facing = FacingDirection.DOWN;
     private float stateTime = 0;
-    private int exp = 0; //初始經驗值
+    private int currentExp = 0; //初始經驗值
+    private int totalExp = 0; //總經驗值，結算面板使用
     private int level = 1;             //初始等級
     private int expToNextLevel = 100; // 初始升級所需經驗
     // 血量相關初始
@@ -254,12 +255,16 @@ public class Character {
     }
     //經驗值計算
     public void addExp(int value) {
-        this.exp += value;
-        System.out.println("Gained " + value + " EXP. Total: " + exp);
+        this.currentExp += value;
+        this.totalExp += value;
+        System.out.println("Gained " + value + " EXP. Total: " + currentExp);
         checkLevelUp();
     }
     public int getCurrentExp() {
-        return exp;
+        return currentExp;
+    }
+    public int getTotalExp() {
+        return totalExp;
     }
 
     public float getCurrentHealth() {
@@ -273,8 +278,8 @@ public class Character {
         return level;
     }
     private void checkLevelUp() {
-        while (exp >= expToNextLevel) {
-            exp -= expToNextLevel;
+        while (currentExp >= expToNextLevel) {
+            currentExp -= expToNextLevel;
             level++;
             expToNextLevel = calculateNextLevelExp();
             // 這裡可以加上升級特效或音效

@@ -14,6 +14,7 @@ import com.hotaruinori.Attack.MissileManager;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
+    private CharacterMovement characterMovement;
     private Music music;
     private InfiniteBackground infiniteBackground;
     private HUD hud;  //新增UI
@@ -52,6 +53,8 @@ public class Main implements ApplicationListener {
         // 初始化角色
         character = new Character();
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());
+        //移動操作功能，現在獨立出來了
+        characterMovement = new CharacterMovement(character, viewport);
 
         // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
@@ -117,9 +120,9 @@ public class Main implements ApplicationListener {
             input();
             logic();
 
-            // 加上角色死亡檢查：在 logic() 裡也可以
+            // 加上角色死亡檢查：在 logic() 裡好像也可以
             if (character.getCurrentHealth() <= 0) {
-                gameOverMenu.show(character.getCurrentExp(), () -> {
+                gameOverMenu.show(character.getTotalExp(), () -> {
                     //restartGame(); // TODO: 尚未實作重啟遊戲功能
                 }, () -> {
                     Gdx.app.exit(); // 離開
@@ -133,32 +136,7 @@ public class Main implements ApplicationListener {
     }
 
     private void input() {
-        float speed = 4f;
-        float delta = Gdx.graphics.getDeltaTime();
-        boolean moving = false;
-        Vector2 direction = new Vector2(0, 0);
-
-        // 處理鍵盤輸入（現在可以同時檢測多個按鍵）
-        if (Gdx.input.isKeyPressed(Input.Keys.RIGHT) || Gdx.input.isKeyPressed(Input.Keys.D)) {direction.x += 1;}
-        if (Gdx.input.isKeyPressed(Input.Keys.LEFT) || Gdx.input.isKeyPressed(Input.Keys.A)) {direction.x -= 1;}
-        if (Gdx.input.isKeyPressed(Input.Keys.UP) || Gdx.input.isKeyPressed(Input.Keys.W)) {direction.y += 1;}
-        if (Gdx.input.isKeyPressed(Input.Keys.DOWN) || Gdx.input.isKeyPressed(Input.Keys.S)) {direction.y -= 1;}
-
-        if (!direction.isZero()) {
-            character.moveWithDirection(delta, direction, speed);
-            moving = true;
-        }
-
-        // 觸控移動保持不變
-        if (Gdx.input.isTouched()) {
-            touchPos.set(Gdx.input.getX(), Gdx.input.getY());
-            viewport.unproject(touchPos);
-            character.moveTo(touchPos.x, touchPos.y);
-            moving = true;
-        }
-
-        character.update(delta, moving);
-        character.updateMovement(delta);
+        characterMovement.handle(Gdx.graphics.getDeltaTime());
     }
 
     private void logic() {
