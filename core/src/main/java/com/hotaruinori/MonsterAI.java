@@ -2,6 +2,7 @@ package com.hotaruinori;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
+import com.hotaruinori.Character;
 
 public class MonsterAI {
 
@@ -16,15 +17,16 @@ public class MonsterAI {
 
     //範圍
     private float attackRange; // 怪物可以攻擊的距離範圍
-    private float LASER_Range=1f; //可以放雷射的範圍
-    private float MISSILE_Range=10f; //可以放飛彈的範圍
+    private float LASER_Range=4f; //可以放雷射的範圍
+    private float MISSILE_Range=4f; //可以放飛彈的範圍
     private float Charge_Range=3f; //可以衝撞的範圍
+    private float Charge_Bang=3f; //衝撞的爆炸範圍
     //之後會新增
     private float MISSILE_BIG_Range=600f;
 
     // 為不同攻擊模式設定獨立的冷卻時間
     private float genericAttackCooldownDuration = 1f; // 所有攻擊後共用的短暫冷卻時間
-    private float laserCooldown = 30.0f; // 雷射攻擊冷卻時間 (範例值)
+    private float laserCooldown = 5.0f; // 雷射攻擊冷卻時間 (範例值)
     private float missileCooldown = 5.0f; // 飛彈攻擊冷卻時間 (範例值)
     private float chargeCooldown = 5.0f; // 衝撞攻擊冷卻時間 (範例值)
 
@@ -36,7 +38,7 @@ public class MonsterAI {
     private float timeSinceLastChargeAttack;
 
     // 雷射和衝撞可能需要額外的準備時間或持續時間
-    private float laserPreparationTime = 1.0f; // 雷射準備時間
+    private float laserPreparationTime = 1f; // 雷射準備時間
     private float laserDuration = 0.5f;       // 雷射持續時間
     private float chargePreparationTime = 1f; // 衝撞準備時間
     private float chargeDuration = 2f;      // 衝撞移動持續時間 (或衝撞距離)
@@ -70,6 +72,7 @@ public class MonsterAI {
         COOLDOWN // 統一的冷卻狀態，或為每種攻擊設置獨立冷卻狀態
     }
     private BossState currentState;
+    private boolean laserEffectTriggered = false;
 
 
 
@@ -79,7 +82,7 @@ public class MonsterAI {
 
 
     public MonsterAI(BossA monster, Character character, float moveSpeed, float attackDistanceThreshold,
-                      float attackRange, float attackDamage) {
+                     float attackRange, float attackDamage) {
         this.monster = monster;
         this.character = character;
         this.moveSpeed = moveSpeed;
@@ -164,6 +167,7 @@ public class MonsterAI {
                         case LASER_ATTACK:
                             currentState = BossState.ATTACKING_LASER;
                             timeSinceLastLaserAttack = 0;
+                            laserEffectTriggered = false;
                             break;
                         case MISSILE_ATTACK:
                             currentState = BossState.ATTACKING_MISSILE;
@@ -232,10 +236,16 @@ public class MonsterAI {
             monster.playLaserPrepareAnimation(); //準備發射雷射動畫
             // 準備階段：播放準備動畫，可能顯示雷射瞄準線
             System.out.println("Boss 正在準備雷射攻擊...");
+            laserEffectTriggered = false;
             // TODO: 在 BossA 中繪製雷射瞄準線或預警效果
 
         } else if (timeSinceLastLaserAttack < laserPreparationTime + laserDuration) {
-            monster.playLaserAttackEffect(); //發射雷射動畫
+
+            if (!laserEffectTriggered) { // <--- 確保只在雷射攻擊開始時觸發一次效果
+                monster.playLaserAttackEffect(character.getCenterPosition(), attackDamage * laserDamageCoefficient); // <--- 呼叫 BossA 的雷射啟動方法
+                laserEffectTriggered = true;
+            }
+            monster.playLaserPrepareAnimation();
             // 攻擊階段：發射雷射，造成傷害
             System.out.println("Boss 發射雷射！");
             // TODO: 在 BossA 中繪製雷射光束效果
@@ -244,13 +254,11 @@ public class MonsterAI {
             // 假設每幀都造成傷害，需要根據deltaTime調整傷害量
             // character.takeDamage(attackDamage * deltaTime / laserDuration); // 範例持續傷害
             // 為了簡化，可以只在雷射開始時造成一次傷害
-            if (timeSinceLastLaserAttack - deltaTime < laserPreparationTime) { // 確保只造成一次傷害
-                character.takeDamage(attackDamage * laserDamageCoefficient); // 雷射傷害可以比普通攻擊高
-                System.out.println("玩家受到雷射傷害！"+attackDamage * laserDamageCoefficient+ " 點傷害！");
-            }
+
 
         } else {
             // 雷射攻擊結束
+            monster.playIDLE();
             System.out.println("雷射攻擊結束。");
             // 可以切換狀態或由 update 方法處理切換
         }
@@ -297,9 +305,9 @@ public class MonsterAI {
             System.out.println("Boss 正在準備衝撞！");
             // TODO: 在 BossA 中播放準備動畫
         } else {
-
+            monster.playChargePrepareAnimation();  //播放衝撞準備動畫
             // 衝撞移動階段：怪物朝目標位置快速移動
-//            System.out.println("Boss 正在衝撞！");
+            System.out.println("Boss 正在衝撞！");
             Vector2 monsterCenter = monster.getCenterPosition();
             // 計算衝撞方向
             Vector2 direction = new Vector2(chargeTargetPosition).sub(monsterCenter).nor();
@@ -318,20 +326,24 @@ public class MonsterAI {
         if (character != null) {
 
             // 在衝撞結束時，檢查玩家是否在終點附近，如果是，造成傷害
+            monster.playChargePrepareAnimation();  //播放衝撞準備動畫
             Vector2 monsterCenter = monster.getCenterPosition();
-            float impactRange =  3f; // 衝撞的衝擊範圍
+            float impactRange =  Charge_Bang; // 衝撞的爆炸範圍
             if (monsterCenter.dst(character.getCenterPosition()) < impactRange) {
-                monster.playChargeImpactEffect();  // 播放衝撞擊中效果
+//                monster.playChargeImpactEffect();  // 播放衝撞擊中效果
+
                 System.out.println("Boss 衝撞擊中玩家，造成 " + attackDamage * 3 + " 點傷害！");
                 character.takeDamage(attackDamage * chargeDamageCoefficient); // 衝撞傷害最高
+                monster.playIDLE();
             } else {
+                monster.playChargePrepareAnimation();  //播放衝撞準備動畫
+                monster.playIDLE();
                 System.out.println("Boss 衝撞未擊中玩家。");
             }
             // 觸發衝撞結束動畫/音效
         }
     }
 }
-
 
 
 

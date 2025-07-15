@@ -6,6 +6,7 @@ import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.hotaruinori.Character;
 
+
 public class Missile {
     private Sprite missileSprite;
     private Vector2 position;
@@ -13,7 +14,7 @@ public class Missile {
     private float speed;
     private float damage;
     private boolean active;
-    private float lifeTime = 4.0f;  //飛彈存活時間
+    private float lifeTime = 3.0f;  //飛彈存活時間
     private float timeElapsed = 0f;
     private float MissileWidth = 0.4f;  //飛彈圖片大小
     private float MissileHeight = 0.4f; //飛彈圖片大小
@@ -82,12 +83,12 @@ public class Missile {
 
 
             // 或者，如果你想要發射後有一小段直線，然後再開始追蹤，可以這樣做：
-             float trackingDelay = 0.5f; // 飛彈飛行 0.5 秒後才開始追蹤
-             float turnSpeed = 0.2f; // 轉向速度，0-1 之間，越小轉向越慢
-             if (timeElapsed > trackingDelay) {
+            float trackingDelay = 0.5f; // 飛彈飛行 0.5 秒後才開始追蹤
+            float turnSpeed = 0.2f; // 轉向速度，0-1 之間，越小轉向越慢
+            if (timeElapsed > trackingDelay) {
                 Vector2 desiredVelocity = directionToTarget.scl(speed);
                 velocity.lerp(desiredVelocity, turnSpeed); // 平滑轉向
-             }
+            }
             // 否則，保持初始速度（不需要額外寫 else 塊，因為 velocity 已經在建構子中設定了）
         }
 
