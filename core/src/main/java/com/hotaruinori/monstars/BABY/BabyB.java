@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
 import com.hotaruinori.Plays.Character;
+import com.hotaruinori.Plays.ExpBall;
 
 public class BabyB {
 
@@ -197,6 +198,7 @@ public class BabyB {
             currentHealth = 0;
             isAlive = false;
             System.out.println("小怪已被擊敗！");
+            ExpBall.spawn(getCenterPosition().x, getCenterPosition().y);
         }
     }
 

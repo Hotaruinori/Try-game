@@ -151,10 +151,8 @@ public class HUD {
                 }
         // 🆕 顯示遊戲時間（秒）
         if (monsterGenerator != null) {
-            System.out.println("GameTime in HUD(): " + monsterGenerator.getGameTime());
             float seconds = monsterGenerator.getGameTime();
             String timeString = String.format("GameTime: %.1f s", seconds);
-            System.out.println("HUD time: " + timeString);  // 看看這裡印出來的時間是不是變動
 
             // 改成螢幕左上角，Y座標用 hudViewport 的高度
             font.draw(batch, timeString, 10, hudViewport.getScreenHeight() - 10);

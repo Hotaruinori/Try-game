@@ -166,7 +166,6 @@ public class Main implements ApplicationListener {
         missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
         // ✅ 更新怪物生成器
         monsterGenerator.update(deltaTime);
-        System.out.println("GameTime in Main.logic(): " + monsterGenerator.getGameTime());
         // 經驗球
         ExpBall.update(deltaTime, character);
         hud.setExp(character.getCurrentExp(), character.getNextLevelExp(), character.getCurrentLevel());

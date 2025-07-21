@@ -7,6 +7,7 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.hotaruinori.Plays.Character;
+import com.hotaruinori.Plays.ExpBall;
 
 
 public class BabyC {
@@ -246,6 +247,7 @@ public class BabyC {
                 // 目前的邏輯是只有碰撞才會造成自爆傷害，被擊敗只是觸發自爆動畫
             }
             System.out.println("小怪已被擊敗！");
+            ExpBall.spawn(getCenterPosition().x, getCenterPosition().y);
             // TODO: 在這裡處理 Boss 死亡的邏輯，例如播放死亡動畫、掉落物品、遊戲勝利等
         }
     }
