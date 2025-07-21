@@ -52,7 +52,7 @@ public class Main implements ApplicationListener {
         infiniteBackground = new InfiniteBackground("background2.png");
         // 初始化隨機背景物件，用來隨機產生背景裝飾物的函式，你可以控制中心點與範圍（這邊用 Vector2(0, 0) 為中心，範圍 20x10，代表覆蓋整個地圖的寬與高）。
         music = Gdx.audio.newMusic(Gdx.files.internal("music.mp3"));
-        hud = new HUD();  //HUD介面
+
         //初始化渲染系統
         spriteBatch = new SpriteBatch();
         viewport = new FitViewport(8, 5);
@@ -62,6 +62,11 @@ public class Main implements ApplicationListener {
         character.setBlockingObjects(infiniteBackground.getBlockingObjects());
         //移動操作功能，現在獨立出來了
         characterMovement = new CharacterMovement(character, viewport);
+        // ✅ 初始化怪物生成器（每 5 秒生成一次怪物）
+        monsterGenerator = new Monster_Generator(character, viewport.getCamera());
+        //顯示時間用
+        hud = new HUD();  //HUD介面
+        hud.setMonsterGenerator(monsterGenerator); // 設定來源後即可顯示時間
 
         // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
@@ -84,9 +89,6 @@ public class Main implements ApplicationListener {
         // 5/31新增飛彈系列  讓 BossA 知道 MissileManager
         missileManager = new MissileManager(); // <--- 初始化 MissileManager
         missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
-
-        // ✅ 初始化怪物生成器（每 5 秒生成一次怪物）
-        monsterGenerator = new Monster_Generator(character, viewport.getCamera());
 
         //設置音樂
         music.setLooping(true);
@@ -164,6 +166,7 @@ public class Main implements ApplicationListener {
         missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
         // ✅ 更新怪物生成器
         monsterGenerator.update(deltaTime);
+        System.out.println("GameTime in Main.logic(): " + monsterGenerator.getGameTime());
         // 經驗球
         ExpBall.update(deltaTime, character);
         hud.setExp(character.getCurrentExp(), character.getNextLevelExp(), character.getCurrentLevel());

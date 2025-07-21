@@ -10,12 +10,15 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.hotaruinori.monstars.Monster_Generator;
+import com.badlogic.gdx.graphics.g2d.GlyphLayout;
 
 /**
  * HUD Class：負責顯示畫面上方的資訊（例如經驗條與武器圖示）
  */
 public class HUD {
 
+    private Monster_Generator monsterGenerator;     // 引用 Monster_Generator 以取得遊戲時間
     private ShapeRenderer shapeRenderer; // 畫條形圖用（血條、經驗條）
     private BitmapFont font;             // 用來顯示文字
     private Texture[] weaponIcons;       // 武器圖示陣列（最多三個）
@@ -57,6 +60,13 @@ public class HUD {
         weaponIcons[0] = new Texture(Gdx.files.internal("weapon/Air_Cannon.png")); // 第1武器
         weaponIcons[1] = null; // 第2武器：尚未獲得
         weaponIcons[2] = null; // 第3武器：尚未獲得
+    }
+
+    /**
+     * 設定 Monster_Generator（用來讀取遊戲時間）
+     */
+    public void setMonsterGenerator(Monster_Generator generator) {
+        this.monsterGenerator = generator;
     }
 
     /**
@@ -139,6 +149,16 @@ public class HUD {
                         batch.draw(icon, iconX, iconY, 32, 32);
                     }
                 }
+        // 🆕 顯示遊戲時間（秒）
+        if (monsterGenerator != null) {
+            System.out.println("GameTime in HUD(): " + monsterGenerator.getGameTime());
+            float seconds = monsterGenerator.getGameTime();
+            String timeString = String.format("GameTime: %.1f s", seconds);
+            System.out.println("HUD time: " + timeString);  // 看看這裡印出來的時間是不是變動
+
+            // 改成螢幕左上角，Y座標用 hudViewport 的高度
+            font.draw(batch, timeString, 10, hudViewport.getScreenHeight() - 10);
+        }
 
         batch.end();
     }

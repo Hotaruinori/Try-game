@@ -32,6 +32,10 @@ public class Monster_Generator {
     private Camera camera;                          // 攝影機資訊，用來決定生成邊界
     private float gameTime = 0f;                    // 遊戲總經過時間（秒）
 
+    public float getGameTime() {
+        return gameTime;
+    }
+
     // 每種怪物的生成規則
     private MonsterSpawnRule babyARule = new MonsterSpawnRule(1.0f, 0f);    // BabyA 每 1 秒，從 0 秒開始
     private MonsterSpawnRule babyBRule = new MonsterSpawnRule(5.0f, 20f);   // BabyB 每 5 秒，從 20 秒開始
