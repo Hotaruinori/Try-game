@@ -38,8 +38,8 @@ public class Monster_Generator {
 
     // 每種怪物的生成規則
     private MonsterSpawnRule babyARule = new MonsterSpawnRule(1.0f, 0f);    // BabyA 每 1 秒，從 0 秒開始
-    private MonsterSpawnRule babyBRule = new MonsterSpawnRule(5.0f, 20f);   // BabyB 每 5 秒，從 20 秒開始
-    private MonsterSpawnRule babyCRule = new MonsterSpawnRule(8.0f, 40f);   // BabyC 每 8 秒，從 40 秒開始
+    private MonsterSpawnRule babyBRule = new MonsterSpawnRule(5.0f, 60f);   // BabyB 每 5 秒，從 20 秒開始
+    private MonsterSpawnRule babyCRule = new MonsterSpawnRule(5.0f, 30f);   // BabyC 每 8 秒，從 40 秒開始
 
     // 各怪物類型分開儲存（方便管理與更新）
     private Array<BabyA> babyAList = new Array<>();

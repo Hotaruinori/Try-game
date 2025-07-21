@@ -70,10 +70,10 @@ public class Main implements ApplicationListener {
 
         // 初始化投射物系統，相關參數後續升級系統做好再放入其中，先在main做呼叫
         rainDrops = new Projectiles("drop.png", "drop.mp3");
-        rainDrops.setProjectileCount(5);  //設定投射物數量，後續放進升級系統
-        rainDrops.setProjectileSpeed(10.0f);  //設定投射物速度，後續放進升級系統
-        rainDrops.setSpawnInterval(0.1f);  //設定投射物發射間隔，後續放進升級系統
-        rainDrops.setProjectileSize(0.5f);  //設定投射物發射大小，後續放進升級系統
+        rainDrops.setProjectileSize(0.3f);  //設定投射物發射大小，後續放進升級系統
+        rainDrops.setSpawnInterval(0.5f);  //設定投射物發射間隔，後續放進升級系統
+        rainDrops.setProjectileSpeed(4.0f);  //設定投射物飛行速度，後續放進升級系統
+        rainDrops.setProjectileCount(1);  //設定投射物數量，後續放進升級系統
         rainDrops.setProjectileDamage(10.0f);  //設定投射物發射傷害，後續放進升級系統
 
         //初始化怪物
@@ -135,6 +135,7 @@ public class Main implements ApplicationListener {
 
             // 加上角色死亡檢查：在 logic() 裡好像也可以
             if (character.getCurrentHealth() <= 0) {
+                music.stop(); //停止背景音樂
                 gameOverMenu.show(character.getTotalExp(), () -> {
                     //restartGame(); // TODO: 尚未實作重啟遊戲功能
                 }, () -> {

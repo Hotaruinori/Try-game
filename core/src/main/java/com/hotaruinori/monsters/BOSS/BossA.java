@@ -167,7 +167,7 @@ public class BossA {
         bossDisplaySprite.setSize(monsterWidth, monsterHeight); // 設定 Boss 在世界單位中的大小
         bossDisplaySprite.setPosition(posX, posY); // 設定初始位置
 
-        this.maxHealth = 1000f; // 設定 Boss 的最大生命值
+        this.maxHealth = 10000f; // 設定 Boss 的最大生命值
         this.currentHealth = maxHealth; // 初始生命值等於最大生命值
         this.isAlive = true; // 初始為存活狀態
 

@@ -17,12 +17,12 @@ import com.hotaruinori.monsters.BOSS.BossA;
 
 public class Projectiles {
     // 可調整參數，圖片與聲音要到 main 去調整
-    float PROJECTILE_WIDTH = 0.5f;  // 投射物寬度
-    float PROJECTILE_HEIGHT = 0.5f; // 投射物高度
+    float PROJECTILE_WIDTH = 0.3f;  // 投射物寬度
+    float PROJECTILE_HEIGHT = 0.3f; // 投射物高度
     float SPAWN_INTERVAL = 0.5f;    // 發射間隔
     float PROJECTILE_SPEED = 4.0f;  // 投射物飛行速度
     int PROJECTILE_COUNT = 1;        // 每次發射的投射物數量（可自由調整）
-    float PROJECTILE_Damage = 1;    // 投射物傷害
+    float PROJECTILE_Damage = 10.0f;    // 投射物傷害
     //宣告物件
     private Texture projectileTexture;  //儲存投射物使用的圖片材質（Texture 是圖片素材的基本單位）
     private Sound hitSound;             //發射播放的音效
@@ -171,7 +171,7 @@ public class Projectiles {
         }
 
         // 播放音效（一次發射只播放一次聲音）
-        hitSound.play();
+        hitSound.play(0.2f);
     }
     //各參數的get方法
     public int getProjectileCount() {

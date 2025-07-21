@@ -29,9 +29,9 @@ public class LevelUpMenu {
     private Table table;
     private Projectiles projectiles;
 
-    private static final float DAMAGE_INCREMENT = 0.2f;
-    private static final float SPEED_INCREMENT = 2.0f;
-    private static final float SIZE_INCREMENT = 0.3f;
+    private static final float DAMAGE_INCREMENT = 5.0f;
+    private static final float SPEED_INCREMENT = 1.0f;
+    private static final float SIZE_INCREMENT = 0.1f;
     private static final float RATE_INCREMENT = 0.05f;
 
     private final List<String> allUpgrades = Arrays.asList(

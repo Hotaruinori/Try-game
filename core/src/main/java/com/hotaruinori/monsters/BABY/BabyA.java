@@ -79,7 +79,7 @@ public class BabyA { // 類別名稱改為 Boss
         babyADisplaySprite.setSize(monsterWidth, monsterHeight); // 設定 Boss 在世界單位中的大小
         babyADisplaySprite.setPosition(posX, posY); // 設定初始位置
 
-        this.maxHealth = 20f; // 設定 Boss 的最大生命值 (可以調整)
+        this.maxHealth = 20.0f; // 設定 Boss 的最大生命值 (可以調整)
         this.currentHealth = maxHealth; // 初始生命值等於最大生命值
         this.isAlive = true; // 初始為存活狀態
     }

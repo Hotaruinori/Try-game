@@ -89,7 +89,7 @@ public class BabyB {
         bossDisplaySprite.setSize(monsterWidth, monsterHeight);
         bossDisplaySprite.setPosition(posX, posY);
 
-        this.maxHealth = 50f;
+        this.maxHealth = 300f;
         this.currentHealth = maxHealth;
         this.isAlive = true;
     }

@@ -1,5 +1,7 @@
 package com.hotaruinori.Player;
 
+import com.badlogic.gdx.Gdx;
+import com.badlogic.gdx.audio.Sound;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
 import com.badlogic.gdx.graphics.g2d.Sprite;
@@ -45,6 +47,7 @@ public class Character {
     private static Texture whiteTexture;
     // 升級選單用
     private LevelUpMenu levelUpMenu;
+    private Sound levelUpSound;
 
     // 阻擋物件陣列（用於碰撞檢查）
     private Rectangle[] blockingObjects = new Rectangle[0];  // 預設為空陣列
@@ -149,6 +152,7 @@ public class Character {
         // 使用站立動畫的第一幀初始化精靈
         sprite = new Sprite(standingFrames[FacingDirection.DOWN.ordinal()]);
         sprite.setSize(CHARACTER_WIDTH, CHARACTER_HEIGHT);
+        levelUpSound = Gdx.audio.newSound(Gdx.files.internal("take_item.mp3"));
     }
 
     private void initAnimations() {
@@ -304,6 +308,7 @@ public class Character {
             level++;
             expToNextLevel = calculateNextLevelExp();
             // 這裡可以加上升級特效或音效
+            levelUpSound.play(0.2f);
             System.out.println("Level up! 現在等級：" + level);
         }
     }
