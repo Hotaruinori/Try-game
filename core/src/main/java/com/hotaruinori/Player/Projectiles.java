@@ -1,4 +1,4 @@
-package com.hotaruinori.Plays;
+package com.hotaruinori.Player;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -9,11 +9,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.hotaruinori.monstars.BABY.BabyA;
-import com.hotaruinori.monstars.BABY.BabyB;
-import com.hotaruinori.monstars.BABY.BabyC;
-import com.hotaruinori.monstars.Monster_Generator;
-import com.hotaruinori.monstars.BOSS.BossA;
+import com.hotaruinori.monsters.BABY.BabyA;
+import com.hotaruinori.monsters.BABY.BabyB;
+import com.hotaruinori.monsters.BABY.BabyC;
+import com.hotaruinori.monsters.Monster_Generator;
+import com.hotaruinori.monsters.BOSS.BossA;
 
 public class Projectiles {
     // 可調整參數，圖片與聲音要到 main 去調整
@@ -173,6 +173,23 @@ public class Projectiles {
         // 播放音效（一次發射只播放一次聲音）
         hitSound.play();
     }
+    //各參數的get方法
+    public int getProjectileCount() {
+        return projectileCount;
+    }
+    public float getProjectileSpeed() {
+        return projectileSpeed;
+    }
+    public float getSpawnInterval() {
+        return spawnInterval;
+    }
+    public float getProjectileWidth() {
+        return PROJECTILE_WIDTH;
+    }
+    public float getProjectileDamage() {
+        return projectiledamage;
+    }
+    //各參數的set方法
     //用於給main設定投射物數量用。如：projectiles.setProjectileCount(5);
     public void setProjectileCount(int count) {
         this.projectileCount = Math.max(PROJECTILE_COUNT, count); // 最少一發(預設值)

@@ -1,9 +1,9 @@
-package com.hotaruinori.monstars.other;
+package com.hotaruinori.monsters.other;
 
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.hotaruinori.Plays.Character;
-import com.hotaruinori.monstars.BOSS.BossA;
+import com.hotaruinori.Player.Character;
+import com.hotaruinori.monsters.BOSS.BossA;
 
 public class MonsterAI {
 

@@ -1,13 +1,13 @@
-package com.hotaruinori.monstars;
+package com.hotaruinori.monsters;
 
 import com.badlogic.gdx.graphics.Camera;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.MathUtils;
 import com.badlogic.gdx.utils.Array;
-import com.hotaruinori.Plays.Character;
-import com.hotaruinori.monstars.BABY.BabyA;
-import com.hotaruinori.monstars.BABY.BabyB;
-import com.hotaruinori.monstars.BABY.BabyC;
+import com.hotaruinori.Player.Character;
+import com.hotaruinori.monsters.BABY.BabyA;
+import com.hotaruinori.monsters.BABY.BabyB;
+import com.hotaruinori.monsters.BABY.BabyC;
 
 /**
  * 怪物生成器，用來依據規則在邊緣產生怪物，並統一管理與更新怪物行為。

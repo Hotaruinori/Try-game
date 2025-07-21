@@ -1,4 +1,4 @@
-package com.hotaruinori.monstars.other;
+package com.hotaruinori.monsters.other;
 
 import com.badlogic.gdx.Input;
 import com.badlogic.gdx.InputProcessor;

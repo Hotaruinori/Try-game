@@ -1,4 +1,4 @@
-package com.hotaruinori.Plays;
+package com.hotaruinori.Player;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Animation;
@@ -43,6 +43,8 @@ public class Character {
     private float healTimer = 0f;
     // 單像素白色貼圖用於繪製血條
     private static Texture whiteTexture;
+    // 升級選單用
+    private LevelUpMenu levelUpMenu;
 
     // 阻擋物件陣列（用於碰撞檢查）
     private Rectangle[] blockingObjects = new Rectangle[0];  // 預設為空陣列
@@ -61,6 +63,11 @@ public class Character {
     private Animation<TextureRegion> walkLeftAnimation;
     private Animation<TextureRegion> walkRightAnimation;
     private TextureRegion[] standingFrames;
+
+    //給main.java用的升級選單導入
+    public void setLevelUpMenu(LevelUpMenu menu) {
+        this.levelUpMenu = menu;
+    }
 
     // 角色中心點
     public Vector2 getCenterPosition() {
@@ -293,6 +300,7 @@ public class Character {
     private void checkLevelUp() {
         while (currentExp >= expToNextLevel) {
             currentExp -= expToNextLevel;
+            levelUpMenu.show();
             level++;
             expToNextLevel = calculateNextLevelExp();
             // 這裡可以加上升級特效或音效

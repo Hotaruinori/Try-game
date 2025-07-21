@@ -1,4 +1,4 @@
-package com.hotaruinori.monstars.BOSS;
+package com.hotaruinori.monsters.BOSS;
 
 import com.hotaruinori.Attack.Missile;
 import com.hotaruinori.Attack.MissileManager; // <--- 新增引入
@@ -8,10 +8,10 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2; // 確保有這個 import
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;  // 碰撞判定用
-import com.hotaruinori.Plays.Character;
+import com.hotaruinori.Player.Character;
 import com.badlogic.gdx.math.Intersector;
-import com.hotaruinori.Plays.ExpBall;
-import com.hotaruinori.monstars.other.MonsterAI;
+import com.hotaruinori.Player.ExpBall;
+import com.hotaruinori.monsters.other.MonsterAI;
 
 
 public class BossA {

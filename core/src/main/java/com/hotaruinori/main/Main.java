@@ -11,13 +11,11 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.hotaruinori.Attack.MissileManager;
-import com.hotaruinori.Plays.Character;
-import com.hotaruinori.Plays.CharacterMovement;
-import com.hotaruinori.Plays.ExpBall;
-import com.hotaruinori.Plays.Projectiles;
+import com.hotaruinori.Player.*;
+import com.hotaruinori.Player.Character;
 import com.hotaruinori.main.other.*;
-import com.hotaruinori.monstars.BOSS.BossA;
-import com.hotaruinori.monstars.Monster_Generator;
+import com.hotaruinori.monsters.BOSS.BossA;
+import com.hotaruinori.monsters.Monster_Generator;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
@@ -42,6 +40,8 @@ public class Main implements ApplicationListener {
     private PauseMenu pauseMenu;
     //結束選單
     private GameOverMenu gameOverMenu;
+    //升級選單
+    private LevelUpMenu levelUpMenu;
     //怪物生成器
     private Monster_Generator monsterGenerator;
 
@@ -94,7 +94,9 @@ public class Main implements ApplicationListener {
         music.setLooping(true);
         music.setVolume(.5f);
         music.play();
-        //暫停選單與結束選單
+        //升級選單、暫停選單與結束選單
+        levelUpMenu = new LevelUpMenu(rainDrops);
+        character.setLevelUpMenu(levelUpMenu);    // 傳入給角色
         pauseMenu = new PauseMenu();
         gameOverMenu = new GameOverMenu();
     }
@@ -127,7 +129,7 @@ public class Main implements ApplicationListener {
         }
 
         // 遊戲邏輯只在未暫停與未死亡狀態時進行
-        if (!pauseMenu.isVisible()) {
+        if (!pauseMenu.isVisible() && !levelUpMenu.isVisible()) {
             input();
             logic();
 
@@ -144,6 +146,7 @@ public class Main implements ApplicationListener {
 
         draw(); // 渲染遊戲畫面
         pauseMenu.render(); // 繪製暫停選單（如果開啟）
+        levelUpMenu.render();     // << 加這一行來顯示升級選單
     }
 
     private void input() {

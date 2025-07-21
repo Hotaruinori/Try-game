@@ -3,7 +3,7 @@ package com.hotaruinori.Attack;
 import com.badlogic.gdx.graphics.g2d.SpriteBatch;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
-import com.hotaruinori.Plays.Character; // 需要引入 Character 類別來進行碰撞檢測
+import com.hotaruinori.Player.Character; // 需要引入 Character 類別來進行碰撞檢測
 
 public class MissileManager {
     private Array<Missile> activeMissiles;

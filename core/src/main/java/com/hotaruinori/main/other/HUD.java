@@ -10,8 +10,7 @@ import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
-import com.hotaruinori.monstars.Monster_Generator;
-import com.badlogic.gdx.graphics.g2d.GlyphLayout;
+import com.hotaruinori.monsters.Monster_Generator;
 
 /**
  * HUD Class：負責顯示畫面上方的資訊（例如經驗條與武器圖示）

@@ -1,4 +1,4 @@
-package com.hotaruinori.monstars.BABY; // 假設這個是 Boss 的新路徑
+package com.hotaruinori.monsters.BABY; // 假設這個是 Boss 的新路徑
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Texture;
@@ -6,8 +6,8 @@ import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.math.Rectangle;
-import com.hotaruinori.Plays.Character;
-import com.hotaruinori.Plays.ExpBall;
+import com.hotaruinori.Player.Character;
+import com.hotaruinori.Player.ExpBall;
 
 
 public class BabyA { // 類別名稱改為 Boss

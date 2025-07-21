@@ -1,4 +1,4 @@
-package com.hotaruinori.Plays;
+package com.hotaruinori.Player;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.TextureRegion;
