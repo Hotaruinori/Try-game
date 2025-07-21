@@ -1,4 +1,4 @@
-package com.hotaruinori;
+package com.hotaruinori.Plays;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.audio.Sound;
@@ -9,6 +9,11 @@ import com.badlogic.gdx.math.Rectangle;
 import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.Array;
 import com.badlogic.gdx.utils.viewport.Viewport;
+import com.hotaruinori.monstars.BABY.BabyA;
+import com.hotaruinori.monstars.BABY.BabyB;
+import com.hotaruinori.monstars.BABY.BabyC;
+import com.hotaruinori.monstars.Monster_Generator;
+import com.hotaruinori.monstars.BOSS.BossA;
 
 public class Projectiles {
     // 可調整參數，圖片與聲音要到 main 去調整
@@ -72,11 +77,31 @@ public class Projectiles {
                 hit = true;
             }
             // 2. 判斷是否打到怪物陣列中的任一隻
-            Array<BossA> monsters = monsterGenerator.getMonsters();
+            Array<BabyA> monsterA = monsterGenerator.getBabyA();
             if (!hit) {
-                for (BossA boss : monsters) {
-                    if (boss != null && boss.isAlive() && projectileRectangle.overlaps(boss.BossA_Rectangle())) {
-                        boss.takeDamage(projectiledamage);
+                for (BabyA babyA : monsterA) {
+                    if (babyA != null && babyA.isAlive() && projectileRectangle.overlaps(babyA.BabyA_Rectangle())) {
+                        babyA.takeDamage(projectiledamage);
+                        hit = true;
+                        break; // 只打中一隻怪物就停止
+                    }
+                }
+            }
+            Array<BabyB> monsterB = monsterGenerator.getBabyB();
+            if (!hit) {
+                for (BabyB babyB : monsterB) {
+                    if (babyB != null && babyB.isAlive() && projectileRectangle.overlaps(babyB.BabyB_Rectangle())) {
+                        babyB.takeDamage(projectiledamage);
+                        hit = true;
+                        break; // 只打中一隻怪物就停止
+                    }
+                }
+            }
+            Array<BabyC> monsterC = monsterGenerator.getBabyC();
+            if (!hit) {
+                for (BabyC babyC : monsterC) {
+                    if (babyC != null && babyC.isAlive() && projectileRectangle.overlaps(babyC.BabyC_Rectangle())) {
+                        babyC.takeDamage(projectiledamage);
                         hit = true;
                         break; // 只打中一隻怪物就停止
                     }

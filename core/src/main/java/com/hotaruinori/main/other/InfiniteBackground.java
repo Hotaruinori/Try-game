@@ -1,4 +1,4 @@
-package com.hotaruinori;
+package com.hotaruinori.main.other;
 
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.Sprite;

@@ -1,4 +1,4 @@
-package com.hotaruinori;
+package com.hotaruinori.main;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -11,6 +11,13 @@ import com.badlogic.gdx.math.Vector2;
 import com.badlogic.gdx.utils.ScreenUtils;
 import com.badlogic.gdx.utils.viewport.FitViewport;
 import com.hotaruinori.Attack.MissileManager;
+import com.hotaruinori.Plays.Character;
+import com.hotaruinori.Plays.CharacterMovement;
+import com.hotaruinori.Plays.ExpBall;
+import com.hotaruinori.Plays.Projectiles;
+import com.hotaruinori.main.other.*;
+import com.hotaruinori.monstars.BOSS.BossA;
+import com.hotaruinori.monstars.Monster_Generator;
 
 public class Main implements ApplicationListener {
     // 遊戲資源
@@ -67,6 +74,8 @@ public class Main implements ApplicationListener {
         //初始化怪物
         boss1 = new BossA();
         boss1.setPlayer(character);  //初始化追蹤位置並將"玩家的位置"傳給怪物的class
+        boss1.setMissileManager(missileManager);
+
 
         // 其他物件
         touchPos = new Vector2();
@@ -75,9 +84,9 @@ public class Main implements ApplicationListener {
         // 5/31新增飛彈系列  讓 BossA 知道 MissileManager
         missileManager = new MissileManager(); // <--- 初始化 MissileManager
         missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
-        boss1.setMissileManager(missileManager);
+
         // ✅ 初始化怪物生成器（每 5 秒生成一次怪物）
-        monsterGenerator = new Monster_Generator(character, viewport.getCamera(), 5.0f, missileManager);
+        monsterGenerator = new Monster_Generator(character, viewport.getCamera());
 
         //設置音樂
         music.setLooping(true);
@@ -150,6 +159,7 @@ public class Main implements ApplicationListener {
         if (boss1.isAlive()) { // <--- 新增判斷
             boss1.getMonsterAI().update(deltaTime); // 更新怪物 AI
         }
+
         //飛彈
         missileManager.update(deltaTime); // <--- 由 MissileManager 更新所有飛彈
         // ✅ 更新怪物生成器

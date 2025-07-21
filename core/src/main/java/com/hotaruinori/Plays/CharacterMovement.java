@@ -1,4 +1,4 @@
-package com.hotaruinori;
+package com.hotaruinori.Plays;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.Input;
@@ -10,7 +10,7 @@ import com.badlogic.gdx.utils.viewport.Viewport;
  * 提供一個 public 方法 handle()，讓 Main.input() 呼叫。
  */
 public class CharacterMovement {
-    private final Character character;
+    private final com.hotaruinori.Plays.Character character;
     private final Viewport viewport;
     private final Vector2 touchPos = new Vector2();
 

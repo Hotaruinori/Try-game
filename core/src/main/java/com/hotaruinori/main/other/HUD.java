@@ -1,4 +1,4 @@
-package com.hotaruinori;
+package com.hotaruinori.main.other;
 
 import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.Color;
