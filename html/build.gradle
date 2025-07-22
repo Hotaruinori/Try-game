@@ -164,3 +164,19 @@ java.targetCompatibility = JavaVersion.VERSION_11
 sourceSets.main.java.srcDirs = [ "src/main/java/" ]
 
 eclipse.project.name = appName + "-html"
+
+
+// 自動複製 assets 到 webapp/assets（GWT 專用）
+tasks.register('copyAssetsToWebapp') {
+  doLast {
+    copy {
+      from "${rootDir}/assets"   // 這裡是 core 專案的 assets 資料夾
+      into "${projectDir}/webapp/assets" // 這裡是 HTML 專案的 webapp/assets
+    }
+  }
+}
+
+// 確保 dist 任務執行時會自動先複製資源
+tasks.named("dist").configure {
+  dependsOn("copyAssetsToWebapp")
+}
