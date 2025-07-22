@@ -19,7 +19,7 @@ public class InfiniteBackground {
     private List<Rectangle> blockingObjectsBounds = new ArrayList<>(); // 所有阻擋碰撞的邊界框
 
     // 定義可用的物件類型（含圖片與是否阻擋）
-    private static class BackgroundObjectType {
+    static class BackgroundObjectType {
         public final String name;
         Array<Texture> textures;
         boolean isBlocking;
@@ -93,7 +93,7 @@ public class InfiniteBackground {
     }
 
     // ✅（新增）記錄每個區塊已生成的物件（Sprite 與 blocking 判定）
-    private static class ChunkData {
+    static class ChunkData {
         List<Sprite> objects = new ArrayList<>();
         List<Rectangle> blockingBounds = new ArrayList<>();
     }
@@ -209,117 +209,7 @@ public class InfiniteBackground {
 
         return data;
     }
-    // ✅（新增）=================以下是特殊物件生成規則========================================================
-    public class TownTemplate {
-        // 這個方法用於在指定的區塊(chunkX, chunkY)生成一個鎮區（建築＋圍欄）
-        // 參數 bg 是整個背景物件，data 是用來存放該區塊生成的物件和碰撞邊界資料(方法private ChunkData generateChunk)
-        public static void tryGenerateTown(int chunkX, int chunkY, InfiniteBackground bg, ChunkData data) {
-            BackgroundObjectType houseType = null;
-            BackgroundObjectType fenceType = null;
 
-            // 從 InfiniteBackground 的物件類型清單中，找到名稱是 "house" 和 "fence" 的類型物件並賦值
-            // bg.objectTypes 是一個包含所有背景物件類型的清單
-            for (BackgroundObjectType type : bg.objectTypes) {
-                if (type.name.equals("house")) houseType = type;
-                else if (type.name.equals("fence")) fenceType = type;
-            }
-            if (houseType == null || fenceType == null) return; // 找不到就不產生
-
-            // 計算這個區塊在世界地圖中的左下角絕對座標，chunkX、chunkY 是區塊索引（格子座標），區塊大小（10單位）
-            float chunkOriginX = chunkX * InfiniteBackground.CHUNK_SIZE;
-            float chunkOriginY = chunkY * InfiniteBackground.CHUNK_SIZE;
-
-            // 建築物大小，使用 chunk 大小的比例設定，方便日後調整
-            float chunkSize = InfiniteBackground.CHUNK_SIZE;
-            float houseWidth = chunkSize * 0.25f;  // 房子寬度為 chunk 的 1/4
-            float houseHeight = chunkSize * 0.25f; // 房子高度為 chunk 的 1/4
-
-            // 圍欄厚度，同樣用 chunk 大小的比例
-            float fenceThickness = chunkSize * 0.03f; // 0.03 * chunkSize 約等於 0.3f（原本設定）
-
-            // 計算房子放在四個象限（chunk 中心為分界），左上、右上、左下、右下的偏移量
-            // 先求 chunk 中心座標
-            float centerX = chunkOriginX + chunkSize / 2;
-            float centerY = chunkOriginY + chunkSize / 2;
-
-            // 四個房子左下角座標相對於 chunk 左下角的位置（offset）
-            float[][] offsets = {
-                // 左上 (中心X - houseWidth, 中心Y)
-                {centerX - houseWidth, centerY},
-                // 右上 (中心X, 中心Y)
-                {centerX, centerY},
-                // 左下 (中心X - houseWidth, 中心Y - houseHeight)
-                {centerX - houseWidth, centerY - houseHeight},
-                // 右下 (中心X, 中心Y - houseHeight)
-                {centerX, centerY - houseHeight}
-            };
-
-            // 對四個象限逐一放置建築與圍欄
-            for (float[] offset : offsets) {
-                float houseX = offset[0]; // 建築物左下角 X 座標
-                float houseY = offset[1]; // 建築物左下角 Y 座標
-
-                // 用找到的房子類型的圖片建立一個新的 Sprite 物件
-                Sprite house = new Sprite(houseType.getRandomTexture());
-                // 設定房子的顯示尺寸（寬、高）
-                house.setSize(houseWidth, houseHeight);
-                // 將旋轉與縮放的中心點設為房子的正中央
-                house.setOriginCenter();
-                // 設定房子的左下角位置座標
-                house.setPosition(houseX, houseY);
-                // 把房子加入這個區塊的物件清單中，讓 InfiniteBackground 可以渲染它
-                data.objects.add(house);
-                // 如果房子會阻擋移動，就把它的碰撞邊界矩形加入碰撞清單
-                if (houseType.isBlocking) {
-                    data.blockingBounds.add(new Rectangle(houseX, houseY, houseWidth, houseHeight));
-                }
-
-                // 計算圍欄包覆房子時的左下角座標（向外擴展圍欄厚度）
-                float fx = houseX - fenceThickness;
-                float fy = houseY - fenceThickness;
-                // 計算圍欄覆蓋的寬度與高度（房子大小加上兩邊圍欄厚度）
-                float fw = houseWidth + 2 * fenceThickness;
-                float fh = houseHeight + 2 * fenceThickness;
-
-                // 建立水平方向的圍欄（房子的上方和下方）
-                // 用一個迴圈，每隔 0.5 單位放置一個圍欄，Math.ceil(fw / 0.5f)為計算要放幾個圍欄
-                for (int i = 0; i < Math.ceil(fw / 0.5f); i++) {
-                    // 計算每個圍欄的 x 座標
-                    float x = fx + i * 0.5f;
-                    // 在上下兩個 Y 座標分別放置圍欄，建立一個 浮點數陣列（float array），裡面包含兩個元素，fy 是下方，fy+fh-fenceThickness 是上方
-                    // 增強型 for 迴圈（Enhanced for loop），搭配一個匿名陣列（anonymous array）
-                    for (float y : new float[]{fy, fy + fh - fenceThickness}) {
-                        // 用圍欄圖片建立一個新的 Sprite
-                        Sprite fence = new Sprite(fenceType.getRandomTexture());
-                        fence.setSize(0.4f, 0.3f);
-                        fence.setOriginCenter();
-                        fence.setPosition(x, y);
-                        // 加入這個區塊的物件清單
-                        data.objects.add(fence);
-                        if (fenceType.isBlocking) {
-                            data.blockingBounds.add(new Rectangle(x, y, 0.4f, 0.3f));
-                        }
-                    }
-                }
-
-                // 建立垂直方向的圍欄（房子的左側和右側）同水平方向邏輯
-                for (int i = 0; i < Math.ceil(fh / 0.5f); i++) {
-                    float y = fy + i * 0.5f;
-                    for (float x : new float[]{fx, fx + fw - fenceThickness}) {
-                        Sprite fence = new Sprite(fenceType.getRandomTexture());
-                        fence.setSize(0.3f, 0.4f);
-                        fence.setOriginCenter();
-                        fence.setPosition(x, y);
-                        data.objects.add(fence);
-                        if (fenceType.isBlocking) {
-                            data.blockingBounds.add(new Rectangle(x, y, 0.3f, 0.4f));
-                        }
-                    }
-                }
-            }
-        }
-    }
-// =================以上是特殊物件生成規則========================================================
     public void render(SpriteBatch batch, Vector2 characterCenter, float worldWidth, float worldHeight) {
         int tilesX = (int) Math.ceil(worldWidth / tileWidth) + 2;
         int tilesY = (int) Math.ceil(worldHeight / tileHeight) + 2;
@@ -358,6 +248,10 @@ public class InfiniteBackground {
     // 取得所有阻擋型物件的 Rectangle 陣列，提供給角色做碰撞檢查用
     public Rectangle[] getBlockingObjects() {
         return blockingObjectsBounds.toArray(new Rectangle[0]);
+    }
+
+    public List<BackgroundObjectType> getObjectTypes() {
+        return objectTypes;
     }
 
     public void dispose() {

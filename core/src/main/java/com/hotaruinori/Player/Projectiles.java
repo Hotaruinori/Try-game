@@ -17,8 +17,8 @@ import com.hotaruinori.monsters.BOSS.BossA;
 
 public class Projectiles {
     // 可調整參數，圖片與聲音要到 main 去調整
-    float PROJECTILE_WIDTH = 0.3f;  // 投射物寬度
-    float PROJECTILE_HEIGHT = 0.3f; // 投射物高度
+    float PROJECTILE_WIDTH = 0.1f;  // 投射物寬度
+    float PROJECTILE_HEIGHT = 0.1f; // 投射物高度
     float SPAWN_INTERVAL = 0.5f;    // 發射間隔
     float PROJECTILE_SPEED = 4.0f;  // 投射物飛行速度
     int PROJECTILE_COUNT = 1;        // 每次發射的投射物數量（可自由調整）

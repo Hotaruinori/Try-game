@@ -4,7 +4,7 @@ import com.badlogic.gdx.Gdx;
 import com.badlogic.gdx.graphics.GL20;
 import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
+// import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator; // 移除 FreeType 支援
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.TextButton;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -30,7 +30,7 @@ public class PauseMenu {
     private boolean visible = false;    // 控制暫停選單是否顯示的旗標
     private Runnable onResume;          // 點擊「Resume」按鈕時要執行的回呼函式 (lambda 或匿名類別)
     private Runnable onExit;            // 點擊「Exit Game」按鈕時要執行的回呼函式
-    private BitmapFont font;            // 自訂字型，使用 FreeTypeFontGenerator 載入 TTF 字型檔並產生
+    private BitmapFont font;            // 自訂字型，改為使用預先產生的 BitmapFont（取代 FreeType）
     private Skin skin;                  // 用於儲存並管理 UI 元件的樣式 (LabelStyle, TextButtonStyle 等)
     private Texture bgTex;              // 半透明背景用的貼圖 (Texture 需記得 dispose)
 
@@ -44,21 +44,8 @@ public class PauseMenu {
         // 將輸入事件處理權交給 stage，讓按鈕可正常接收點擊事件
         Gdx.input.setInputProcessor(stage);
 
-        // 使用 FreeTypeFontGenerator 從 TTF 字型檔建立 BitmapFont，方便 UI 文字渲染
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/myfont.ttf"));
-
-        // 設定字型生成參數：字型大小與陰影設定
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 64;                             // 字型大小
-        parameter.shadowOffsetX = 2;                     // 陰影水平偏移
-        parameter.shadowOffsetY = 2;                     // 陰影垂直偏移
-        parameter.shadowColor = new Color(0, 0, 0, 1);  // 陰影顏色：不透明黑色
-
-        // 產生 BitmapFont，供 UI 元件使用
-        font = generator.generateFont(parameter);
-
-        // 產生完字型後要釋放字型生成器的資源，避免記憶體洩漏
-        generator.dispose();
+        // 改為使用 Hiero 預先產生的 BitmapFont，避免 FreeType 在 HTML 版本打包錯誤
+        font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt")); // 注意此處需存在對應的 myfont.fnt 和 png
 
         // 建立 Skin，管理所有 UI 樣式設定
         skin = new Skin();
@@ -98,13 +85,13 @@ public class PauseMenu {
         table.setBackground(bg);
 
         // 建立 Label 元件顯示 "Paused" 標題，使用剛設定好的 skin 樣式
-        Label pausedLabel = new Label("Paused", skin);
+        Label pausedLabel = new Label("暫停Paused", skin);
 
         // 調整字型大小的縮放比例，因為字型本身已經很大，故再放大 1.5 倍以視覺更舒適
         pausedLabel.setFontScale(1.5f);
 
         // 建立 Resume 按鈕，使用 skin 預設樣式
-        TextButton resumeButton = new TextButton("Resume", skin);
+        TextButton resumeButton = new TextButton("返回遊戲Resume", skin);
 
         // 給 Resume 按鈕新增點擊事件監聽器
         // run() 是 Runnable 介面裡的唯一方法，代表執行「裡面的程式碼」。
@@ -117,7 +104,7 @@ public class PauseMenu {
         });
 
         // 建立 Exit Game 按鈕
-        TextButton exitButton = new TextButton("Exit Game", skin);
+        TextButton exitButton = new TextButton("離開遊戲Exit Game", skin);
 
         // 給 Exit Game 按鈕新增點擊事件監聽器
         exitButton.addListener(new ClickListener() {

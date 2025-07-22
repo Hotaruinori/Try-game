@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.Color;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.Pixmap;
 import com.badlogic.gdx.graphics.g2d.BitmapFont;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.graphics.g2d.NinePatch;
 import com.badlogic.gdx.scenes.scene2d.Stage;
 import com.badlogic.gdx.scenes.scene2d.ui.Label;
@@ -44,15 +43,8 @@ public class GameOverMenu {
         // 預設 UI 事件處理給 Stage（可在 show() 時再設）
         Gdx.input.setInputProcessor(stage);
 
-        // 建立字型
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/myfont.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 64;
-        parameter.shadowOffsetX = 2;
-        parameter.shadowOffsetY = 2;
-        parameter.shadowColor = new Color(0, 0, 0, 1);
-        font = generator.generateFont(parameter);
-        generator.dispose();
+        // 改為使用 Hiero 預先產生的 BitmapFont（.fnt + .png）
+        font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
 
         skin = new Skin();
 

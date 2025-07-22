@@ -31,7 +31,7 @@ public class LevelUpMenu {
 
     private static final float DAMAGE_INCREMENT = 5.0f;
     private static final float SPEED_INCREMENT = 1.0f;
-    private static final float SIZE_INCREMENT = 0.1f;
+    private static final float SIZE_INCREMENT = 0.25f;
     private static final float RATE_INCREMENT = 0.05f;
 
     private final List<String> allUpgrades = Arrays.asList(
@@ -46,11 +46,8 @@ public class LevelUpMenu {
 
         stage = new Stage(new ScreenViewport());
 
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/myfont.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 48;
-        font = generator.generateFont(parameter);
-        generator.dispose();
+        // 改為使用 Hiero 預先產生的 BitmapFont，避免 FreeType 在 HTML 版本打包錯誤
+        font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt")); // 注意此處需存在對應的 myfont.fnt 和 png
 
         skin = new Skin();
 

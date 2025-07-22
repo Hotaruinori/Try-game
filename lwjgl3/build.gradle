@@ -11,10 +11,6 @@ buildscript {
   }
 }
 plugins {
-  id 'java'
-  id 'edu.sc.seis.launch4j' version '2.5.4'
-}
-plugins {
   id "application"
 }
 apply plugin: 'io.github.fourlastor.construo'
@@ -26,10 +22,10 @@ sourceSets.main.resources.srcDirs += [ rootProject.file('assets').path ]
 mainClassName = 'com.hotaruinori.lwjgl3.Lwjgl3Launcher'
 application.setMainClass(mainClassName)
 eclipse.project.name = appName + '-lwjgl3'
-java.sourceCompatibility = 17
-java.targetCompatibility = 17
+java.sourceCompatibility = 8
+java.targetCompatibility = 8
 if (JavaVersion.current().isJava9Compatible()) {
-        compileJava.options.release.set(17)
+        compileJava.options.release.set(8)
 }
 
 dependencies {
@@ -183,33 +179,3 @@ startScripts.classpath = project.tasks.jar.outputs.files
 if(enableGraalNative == 'true') {
   apply from: file("nativeimage.gradle")
 }
-
-jar {
-  archiveBaseName.set("DoraSurvivor") // 可改成你要的檔案名稱
-  archiveVersion.set("0.8.0")
-
-  manifest {
-    attributes 'Main-Class': 'com.hotaruinori.lwjgl3.Lwjgl3Launcher'
-  }
-
-  from {
-    configurations.runtimeClasspath.collect {
-      it.isDirectory() ? it : zipTree(it)
-    }
-  }
-
-  duplicatesStrategy = DuplicatesStrategy.EXCLUDE
-}
-
-launch4j {
-  mainClassName = 'com.hotaruinori.lwjgl3.Lwjgl3Launcher'  // 改成你的主類別
-  outputDir = "build/launch4j"
-  outfile = "DoraSurvivor.exe"
-  jar = "${buildDir}/libs/Dora-Survivor-1.0.0.jar" // 跟上面 jar 設定一致
-  bundledJrePath = "jre" // 要壓縮成包給使用者的 JRE 資料夾名
-  jvmOptions = ['-Xmx512M']
-  copyConfigurable = files(jar) // ✅ 修正這行
-  dontWrapJar = false
-}
-//打包方式： ./gradlew clean lwjgl3:jar lwjgl3:launch4j
-//打包補充說明： 要在專案跟目錄執行，另外需要提供jre(openjdk)中的檔案放在Try-game\lwjgl3\build\launch4j\jre 資料夾內

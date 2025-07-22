@@ -18,8 +18,8 @@ public class Character {
     float CURRENT_HEALTH = 100.0f;  //當前血量
     float AUTO_HEAL_POINT = 1.0f;     // 秒回
     float MOVE_SPEED = 4.0f;        //移動速度
-    float CHARACTER_HEIGHT = 0.5f;        //角色高度
-    float CHARACTER_WIDTH = 0.5f;        //角色寬度
+    float CHARACTER_HEIGHT = 0.25f;        //角色高度
+    float CHARACTER_WIDTH = 0.25f;        //角色寬度
     // 角色狀態枚舉
     public enum State {
         STANDING, WALKING

@@ -1,4 +1,4 @@
-package com.hotaruinori.main;
+package com.hotaruinori;
 
 import com.badlogic.gdx.ApplicationListener;
 import com.badlogic.gdx.Gdx;
@@ -76,19 +76,17 @@ public class Main implements ApplicationListener {
         rainDrops.setProjectileCount(1);  //設定投射物數量，後續放進升級系統
         rainDrops.setProjectileDamage(10.0f);  //設定投射物發射傷害，後續放進升級系統
 
+        // 5/31新增飛彈系列  讓 BossA 知道 MissileManager
+        missileManager = new MissileManager(); // <--- 初始化 MissileManager
+        missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
         //初始化怪物
         boss1 = new BossA();
         boss1.setPlayer(character);  //初始化追蹤位置並將"玩家的位置"傳給怪物的class
         boss1.setMissileManager(missileManager);
 
-
         // 其他物件
         touchPos = new Vector2();
         characterRectangle = new Rectangle();
-
-        // 5/31新增飛彈系列  讓 BossA 知道 MissileManager
-        missileManager = new MissileManager(); // <--- 初始化 MissileManager
-        missileManager.setPlayerCharacter(character); // <--- 將玩家角色傳給 MissileManager
 
         //設置音樂
         music.setLooping(true);

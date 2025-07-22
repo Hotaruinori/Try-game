@@ -15,8 +15,8 @@ public class BabyA { // 類別名稱改為 Boss
     private Sprite babyADisplaySprite;
     private Character character; // 玩家角色引用
 
-    private float monsterWidth = 0.5f;    // 怪物寬度
-    private float monsterHeight = 0.5f;   // 怪物高度
+    private float monsterWidth = 0.25f;    // 怪物寬度
+    private float monsterHeight = 0.25f;   // 怪物高度
 
     private float posX = 0.5f;          // 怪物起始X位置
     private float posY = 0.5f;          // 怪物起始Y位置

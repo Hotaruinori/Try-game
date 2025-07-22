@@ -6,7 +6,6 @@ import com.badlogic.gdx.graphics.OrthographicCamera;
 import com.badlogic.gdx.graphics.Texture;
 import com.badlogic.gdx.graphics.g2d.*;
 import com.badlogic.gdx.graphics.glutils.ShapeRenderer;
-import com.badlogic.gdx.graphics.g2d.freetype.FreeTypeFontGenerator;
 import com.badlogic.gdx.utils.Align;
 import com.badlogic.gdx.utils.viewport.ScreenViewport;
 import com.badlogic.gdx.utils.viewport.Viewport;
@@ -40,15 +39,9 @@ public class HUD {
         shapeRenderer = new ShapeRenderer();
         shapeRenderer.setAutoShapeType(true);
 
-        // 建立 FreeType 字型（支援 .ttf 向量字型）
-        FreeTypeFontGenerator generator = new FreeTypeFontGenerator(Gdx.files.internal("fonts/myfont.ttf"));
-        FreeTypeFontGenerator.FreeTypeFontParameter parameter = new FreeTypeFontGenerator.FreeTypeFontParameter();
-        parameter.size = 20;                  // 字型大小
-        parameter.color = Color.WHITE;        // 主文字顏色
-        parameter.borderColor = Color.BLACK;  // 外框顏色
-        parameter.borderWidth = 1f;           // 外框寬度
-        font = generator.generateFont(parameter);
-        generator.dispose(); // 釋放產生器資源
+        // 改為使用 Hiero 預先產生的 BitmapFont（.fnt + .png）
+        font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
+        font.getData().setScale(0.5f); // 縮小字體
 
         // 預設經驗值
         currentExp = 0;
@@ -151,7 +144,7 @@ public class HUD {
         // 🆕 顯示遊戲時間（秒）
         if (monsterGenerator != null) {
             float seconds = monsterGenerator.getGameTime();
-            String timeString = String.format("GameTime: %.1f s", seconds);
+            String timeString = "GameTime: " + (int)seconds + " s";
 
             // 改成螢幕左上角，Y座標用 hudViewport 的高度
             font.draw(batch, timeString, 10, hudViewport.getScreenHeight() - 10);
