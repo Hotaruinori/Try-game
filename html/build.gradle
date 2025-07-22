@@ -180,3 +180,5 @@ tasks.register('copyAssetsToWebapp') {
 tasks.named("dist").configure {
   dependsOn("copyAssetsToWebapp")
 }
+
+//./gradlew html:dist --warning-mode all

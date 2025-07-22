@@ -35,7 +35,8 @@ public class LevelUpMenu {
     private static final float RATE_INCREMENT = 0.05f;
 
     private final List<String> allUpgrades = Arrays.asList(
-        "Increase Damage", "Increase Attack Speed", "Increase Projectile Speed", "Increase Projectile Size", "Increase Projectile Number"
+        "增加傷害Increase Damage", "增加攻速Increase Attack Speed", "增加投射物速度Increase Projectile Speed",
+        "增加投射物大小Increase Projectile Size", "增加投射物數量Increase Projectile Number"
     );
 
     /**
@@ -48,7 +49,7 @@ public class LevelUpMenu {
 
         // 改為使用 Hiero 預先產生的 BitmapFont，避免 FreeType 在 HTML 版本打包錯誤
         font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt")); // 注意此處需存在對應的 myfont.fnt 和 png
-
+        font.getData().setScale(0.5f); // 縮小字體
         skin = new Skin();
 
         // === 建立半透明背景 Drawable ===
@@ -106,23 +107,23 @@ public class LevelUpMenu {
 
     private void applyUpgrade(String upgrade) {
         switch (upgrade) {
-            case "Increase Damage":
+            case "增加傷害Increase Damage":
                 float newDamage = projectiles.getProjectileDamage() + DAMAGE_INCREMENT;
                 projectiles.setProjectileDamage(newDamage);
                 break;
-            case "Increase Attack Speed":
+            case "增加攻速Increase Attack Speed":
                 float newRate = projectiles.getSpawnInterval() - RATE_INCREMENT;
                 projectiles.setSpawnInterval(newRate);
                 break;
-            case "Increase Projectile Speed":
+            case "增加投射物速度Increase Projectile Speed":
                 float newSpeed = projectiles.getProjectileSpeed() + SPEED_INCREMENT;
                 projectiles.setProjectileSpeed(newSpeed);
                 break;
-            case "Increase Projectile Size":
+            case "增加投射物大小Increase Projectile Size":
                 float newSize = projectiles.getProjectileWidth() + SIZE_INCREMENT;
                 projectiles.setProjectileSize(newSize);
                 break;
-            case "Increase Projectile Number":
+            case "增加投射物數量Increase Projectile Number":
                 int newCount = projectiles.getProjectileCount() + 1;
                 projectiles.setProjectileCount(newCount);
                 break;

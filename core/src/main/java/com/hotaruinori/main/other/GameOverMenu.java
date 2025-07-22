@@ -45,6 +45,7 @@ public class GameOverMenu {
 
         // 改為使用 Hiero 預先產生的 BitmapFont（.fnt + .png）
         font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
+        font.getData().setScale(0.5f); // 縮小字體
 
         skin = new Skin();
 
@@ -72,13 +73,13 @@ public class GameOverMenu {
         Drawable bg = new NinePatchDrawable(new NinePatch(bgTex, 0, 0, 0, 0));
         table.setBackground(bg);
 
-        Label titleLabel = new Label("Game Over", skin);
-        titleLabel.setFontScale(1.8f);
+        Label titleLabel = new Label("遊戲結束Game Over", skin);
+        titleLabel.setFontScale(1.2f);
 
         scoreLabel = new Label("Score: 0", skin);
-        scoreLabel.setFontScale(1.2f);
+        scoreLabel.setFontScale(1.0f);
 
-        TextButton restartButton = new TextButton("Restart", skin);
+        TextButton restartButton = new TextButton("重新開始Restart", skin);
         restartButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {
@@ -86,7 +87,7 @@ public class GameOverMenu {
             }
         });
 
-        TextButton exitButton = new TextButton("Exit Game", skin);
+        TextButton exitButton = new TextButton("離開遊戲Exit Game", skin);
         exitButton.addListener(new ClickListener() {
             @Override
             public void clicked(InputEvent event, float x, float y) {

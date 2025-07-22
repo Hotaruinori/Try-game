@@ -31,9 +31,13 @@ character_img/dora_walk_right3.png
 character_img/dora_walk_right4.png
 drop.mp3
 drop.png
+fonts/font.hiero
 fonts/myfont.fnt
 fonts/myfont.png
 fonts/myfont.ttf
+fonts/myfont1.png
+fonts/myfont2.png
+fonts/myfont3.png
 libgdx.png
 libgdx128.png
 libgdx16.png

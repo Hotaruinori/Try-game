@@ -41,7 +41,7 @@ public class HUD {
 
         // 改為使用 Hiero 預先產生的 BitmapFont（.fnt + .png）
         font = new BitmapFont(Gdx.files.internal("fonts/myfont.fnt"));
-        font.getData().setScale(0.5f); // 縮小字體
+        font.getData().setScale(0.25f); // 縮小字體
 
         // 預設經驗值
         currentExp = 0;
